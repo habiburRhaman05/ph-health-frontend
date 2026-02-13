@@ -1,10 +1,17 @@
+import { getCookie } from '@/features/doctors/services/server';
 import React from 'react'
 
-export default function ProtectedLayout({
+export default async function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+   const cookie = await getCookie()
  
-  return <>{children}</>
+ console.log("cookie",cookie);
+ 
+  return <>
+ cooke =  {cookie}
+  
+  {children}</>
 }
