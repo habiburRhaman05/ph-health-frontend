@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { RoleTab } from '@/features/auth/components/RoleTab'
+import { RoleTab } from '@/features/auth/services/RoleTab'
 import { SignupForm } from '@/features/auth/components/SignupForm'
 import { Stethoscope, Heart, Clock, ShieldCheck, Sparkles } from 'lucide-react'
 

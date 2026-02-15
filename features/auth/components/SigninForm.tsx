@@ -48,16 +48,34 @@ export function SignInForm() {
             email: data.email,
             password: data.password,
         }
-       const user = await handleSignIn(payload)
-       console.log(user);
+       const userData = await handleSignIn(payload)
+     
+console.log(userData);
+
+        //  setIsRedirecting(true);
+          
+        //   await refetchQueries("user-profile");
+
+          // Determine route
+        if(userData.success){
+              const url = userData.data.user.role === "PATIENT" 
+            ? "/dashboard/patient" 
+            : userData.data.user.role === "DOCTOR" 
+            ? "/dashboard/doctor" 
+            : "/dashboard/admin";
+
+          // Use window.location for a fresh state, or router.push for SPA speed
+          // window.location.href = route;
+          router.push(url)
+        }
        
     }
 
     useEffect(() => {
         setMounted(true)
-        if (isSuccess) {
-                router.push("/dashboard")
-        }
+        // if (isSuccess) {
+        //         router.push("/dashboard")
+        // }
     }, [isSuccess, router])
 
 
@@ -146,13 +164,16 @@ export function SignInForm() {
                     </form>
                 </Form>
 
-                <div className="my-6 flex items-center gap-3">
-                    <div className="flex-1 border-t border-border" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Secure Network</span>
-                    <div className="flex-1 border-t border-border" />
-                </div>
+                        {/* Divider */}
+          <div className="my-6  flex items-center gap-3">
+            <div className="flex-1 border-t border-border" />
+            <span className="text-xs text-muted-foreground">or continue with</span>
+            <div className="flex-1 border-t border-border" />
+          </div>
 
-                <SocialLogin />
+               
+                 <SocialLogin />
+               
             </motion.div>
         </div>
     )
