@@ -1,6 +1,5 @@
 'use client'
 
-import { createPortal } from 'react-dom' // Import Portal
 import { Button } from '@/components/ui/button'
 import {
     Form,
@@ -11,26 +10,28 @@ import {
     FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { useApiMutation } from '@/hooks/useApiMutation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, EyeOff, Loader2, CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Activity } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { LoginFormData, LoginSchema } from '../validations'
 import SocialLogin from './SocialLogin'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
 export function SignInForm() {
     const router = useRouter()
-    const [mounted, setMounted] = useState(false) // Required for Portals in Next.js
+    const [mounted, setMounted] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
-    const [isSuccessOverlay, setIsSuccessOverlay] = useState(false)
-    // Handle Hydration for Portal
+    const [showLoading, setShowLoading] = useState(false)
+
     useEffect(() => {
         setMounted(true)
     }, [])
 
-    const form = useForm({
+    const form = useForm<LoginFormData>({
         resolver: zodResolver(LoginSchema),
         defaultValues: {
             email: '',
@@ -38,58 +39,84 @@ export function SignInForm() {
         },
     })
 
-    const { mutateAsync: handleSignIn, isPending: isLoading, isSuccess } = useApiMutation({
-        method: "POST",
-        endpoint: "/api/v1/auth/login",
-    })
+    const { mutateAsync: signInMutation, isPending: isLoading } = useMutation({
+        mutationFn: async (data: LoginFormData) => {
+            const res = await fetch(`/api/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify(data),
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.message || "Login failed");
+            }
+
+            return res.json();
+        },
+        onError: (error) => {
+            toast.error(error.message)
+        },
+        onSuccess: () => {
+            // Trigger the full screen loader once the API is successful
+            setShowLoading(true)
+        }
+    });
 
     async function onSubmit(data: LoginFormData) {
-        const payload = {
-            email: data.email,
-            password: data.password,
+        try {
+            const userData = await signInMutation(data);
+
+            if (userData?.success) {
+                const role = userData.data.user.role;
+                
+                let url = "/dashboard";
+                if (role === "PATIENT") url = "/dashboard/patient";
+                else if (role === "DOCTOR") url = "/dashboard/doctor";
+                else if (role === "ADMIN") url = "/dashboard/admin";
+
+                // We keep showLoading true while Next.js finishes the push
+                router.push(url);
+            }
+        } catch (error) {
+            console.error("Login Error:", error);
+            setShowLoading(false) // Hide loader if logic fails after success
         }
-       const userData = await handleSignIn(payload)
-     
-console.log(userData);
-
-        //  setIsRedirecting(true);
-          
-        //   await refetchQueries("user-profile");
-
-          // Determine route
-        if(userData.success){
-              const url = userData.data.user.role === "PATIENT" 
-            ? "/dashboard/patient" 
-            : userData.data.user.role === "DOCTOR" 
-            ? "/dashboard/doctor" 
-            : "/dashboard/admin";
-
-          // Use window.location for a fresh state, or router.push for SPA speed
-          // window.location.href = route;
-          router.push(url)
-        }
-       
     }
 
-    useEffect(() => {
-        setMounted(true)
-        // if (isSuccess) {
-        //         router.push("/dashboard")
-        // }
-    }, [isSuccess, router])
-
+    if (!mounted) return null;
 
     return (
         <div className='relative w-full'>
-            
-      
-            
-            
+            {/* Full Screen Pre-loader */}
+            <AnimatePresence>
+                {showLoading && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background/80 backdrop-blur-md"
+                    >
+                        <div className="flex flex-col items-center gap-4">
+                            <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-xl shadow-primary/20">
+                                <Activity className="h-8 w-8 text-primary-foreground animate-pulse" />
+                            </div>
+                            <div className="flex flex-col items-center gap-1">
+                                <h3 className="text-lg font-bold tracking-tight">Preparing your portal</h3>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                    <span>Redirecting...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            {/* 2. The Login Form remains in its layout position */}
             <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 1 }}
+                animate={{ opacity: showLoading ? 0 : 1 }} // Fade out form when loader appears
                 className="w-full"
             >
                 <div className="mb-8 text-center lg:text-left">
@@ -110,7 +137,7 @@ console.log(userData);
                                             type="email"
                                             placeholder="example@gmail.com"
                                             {...field}
-                                            disabled={isLoading}
+                                            disabled={isLoading || showLoading}
                                             className="h-10"
                                         />
                                     </FormControl>
@@ -130,11 +157,12 @@ console.log(userData);
                                                 type={showPassword ? 'text' : 'password'}
                                                 placeholder="••••••••"
                                                 {...field}
-                                                disabled={isLoading}
+                                                disabled={isLoading || showLoading}
                                                 className="h-10"
                                             />
                                             <button
                                                 type="button"
+                                                disabled={isLoading || showLoading}
                                                 onClick={() => setShowPassword(!showPassword)}
                                                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                                             >
@@ -147,7 +175,7 @@ console.log(userData);
                             )}
                         />
 
-                        <Button type="submit" className="w-full h-11 font-bold" disabled={isLoading}>
+                        <Button type="submit" className="w-full h-11 font-bold" disabled={isLoading || showLoading}>
                             {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : 'Sign In'}
                         </Button>
 
@@ -164,16 +192,13 @@ console.log(userData);
                     </form>
                 </Form>
 
-                        {/* Divider */}
-          <div className="my-6  flex items-center gap-3">
-            <div className="flex-1 border-t border-border" />
-            <span className="text-xs text-muted-foreground">or continue with</span>
-            <div className="flex-1 border-t border-border" />
-          </div>
-
-               
-                 <SocialLogin />
-               
+                <div className="my-6 flex items-center gap-3">
+                    <div className="flex-1 border-t border-border" />
+                    <span className="text-xs text-muted-foreground">or continue with</span>
+                    <div className="flex-1 border-t border-border" />
+                </div>
+                
+                <SocialLogin />
             </motion.div>
         </div>
     )
