@@ -1,3 +1,4 @@
+import { envVeriables } from '@/config/envVariables';
 import httpClient from '@/lib/axios-client';
 import React, { useState } from 'react'
 
@@ -9,7 +10,7 @@ const SocialLogin = () => {
       setIsLoading(true);
       const res = await httpClient.post("/api/auth/sign-in/social", {
         provider: "google",
-        callbackURL: "http://localhost:5000/api/v1/auth/google/success?redirect=%2Fdashboard%2Fpatient"
+        callbackURL: `${envVeriables.NEXT_PUBLIC_API_URL}/api/v1/auth/google/success?redirect=%2Fdashboard%2Fpatient`
       });
 
       const data = await res.data;
@@ -18,27 +19,25 @@ const SocialLogin = () => {
       }
     } catch (error) {
       console.log(error);
-      setIsLoading(false); // Reset loading if the request fails
+      setIsLoading(false);
     }
-    // Note: We don't put setIsLoading(false) in 'finally' because 
-    // window.location.href triggers a page redirect, so the component 
-    // will unmount anyway.
+
   };
 
   return (
     <div className="grid grid-cols-1 gap-3">
       <button
         onClick={handleGoogleLogin}
-        disabled={isLoading} // 1. Disable button while loading
+        disabled={isLoading}
         className={`flex items-center justify-center gap-2 rounded-lg border border-border bg-background hover:bg-muted/50 px-4 py-2 transition-colors text-sm font-medium ${
           isLoading ? "opacity-70 cursor-not-allowed" : ""
         }`}
       >
         {isLoading ? (
-          // 2. Show a loading spinner when isLoading is true
+        
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
         ) : (
-          // 3. Show Google Icon when not loading
+    
           <svg className="h-4 w-4" viewBox="0 0 24 24">
             <path
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
