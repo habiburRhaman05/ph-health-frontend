@@ -153,7 +153,7 @@ export default function HomePage() {
             {/* Main Headline */}
             <motion.div variants={itemVariants}>
               <h1 className="text-5xl sm:text-6xl font-bold text-balance">
-                <span className="bg-gradient-to-r from-primary via-primary to-primary/60 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-primary via-blue-500 to-primary/60 bg-clip-text text-transparent">
                   Healthcare at Your
                 </span>
                 <br />

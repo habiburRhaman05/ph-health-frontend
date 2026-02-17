@@ -2,7 +2,7 @@
 import { 
   LayoutDashboard, Users, UserCog, Stethoscope, 
   CalendarDays, FileText, CreditCard, Activity,
-  Settings, ShieldAlert, History
+  Settings, ShieldAlert, History, UserCircle
 } from "lucide-react"
 
 export const SIDEBAR_LINKS = {
@@ -33,6 +33,6 @@ export const SIDEBAR_LINKS = {
     { title: "Prescriptions", href: "/dashboard/patient/prescriptions", icon: FileText },
     { title: "Medical Reports", href: "/dashboard/patient/reports", icon: Activity },
     { title: "Payments", href: "/dashboard/patient/payments", icon: CreditCard },
-    { title: "Profile", href: "/dashboard/patient/profile", icon: CreditCard },
+    { title: "Profile", href: "/dashboard/patient/profile", icon: UserCircle },
   ],
 }

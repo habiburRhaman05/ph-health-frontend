@@ -9,24 +9,23 @@ export default async function ProtectedLayout({
 }: {
   children: React.ReactNode
 }) {
+  const userData = await getProfile();
 
-
-  const userData =await getProfile();
-console.log(userData);
-
-  if(!userData?.user.data){
+  if (!userData?.user.data) {
     redirect("/sign-in")
   }
 
-
-  return <main>
-  <Header/>
-  <div className="flex items-start">
-    <AppSidebar userRole={userData.user.data.role} userName={userData.user.data.name}/>
-    {children}
-  </div>
-
- 
-  
-  </main>
+  return (
+    <main className="min-h-screen bg-background">
+      <Header />
+      <div className="flex">
+        <AppSidebar userRole={userData.user.data.role} userName={userData.user.data.name} />
+        <div className="flex-1 min-h-[calc(100vh-64px)] w-full">
+          <div className="mx-auto max-w-7xl w-full">
+            {children}
+          </div>
+        </div>
+      </div>
+    </main>
+  )
 }

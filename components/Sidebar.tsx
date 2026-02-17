@@ -30,8 +30,7 @@ export function AppSidebar({ userRole, userName }: AppSidebarProps) {
   return (
     <Sidebar 
           collapsible="offcanvas"
-      className="top-16 hidden h-[calc(100vh-64px)] border-r border-border lg:block"
-
+      className="top-16 hidden h-[calc(100vh-64px)] border-r border-border bg-sidebar lg:block"
     >
     
       <SidebarContent>
@@ -48,10 +47,10 @@ export function AppSidebar({ userRole, userName }: AppSidebarProps) {
                     asChild 
                     tooltip={link.title}
                     isActive={isActive}
-                    className={`h-11 rounded-xl px-4 transition-all duration-200 ${
+                    className={`h-11 rounded-lg px-4 transition-all duration-200 ${
                       isActive 
-                      ? "bg-primary/10 text-primary font-bold shadow-sm" 
-                      : "hover:bg-muted/80 text-muted-foreground"
+                      ? "bg-primary/10 text-primary font-semibold" 
+                      : "hover:bg-accent text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     <Link href={link.href} className="flex items-center gap-3">

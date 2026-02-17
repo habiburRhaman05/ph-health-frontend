@@ -18,6 +18,7 @@ export function Navbar() {
 
   const navLinks = [
     { label: 'Find Doctors', href: '/doctors' },
+    { label: 'Roadmap', href: '/roadmap' },
     { label: 'Appointments', href: '/appointments' },
     { label: 'About', href: '#about' },
   ]
