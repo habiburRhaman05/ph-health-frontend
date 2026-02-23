@@ -1,15 +1,12 @@
 'use client'
 
-import React, { ReactNode } from 'react'
-import { motion } from 'framer-motion'
-import { Clock, Heart, Stethoscope, ChevronLeft, ShieldCheck, Star } from 'lucide-react'
-import Link from 'next/link'
+import { ReactNode } from 'react'
 
 const AuthLayout = ({ children }: { children: ReactNode }) => {
 
 
   return (
-   <div>
+   <div className='mx-auto'>
 
     {children}
    

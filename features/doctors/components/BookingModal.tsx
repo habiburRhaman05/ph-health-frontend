@@ -13,9 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import type { Doctor, AppointmentFormData } from '@/features/shared/types'
+import type {  AppointmentFormData } from '@/features/shared/types'
 import { generateVideoCallId } from '@/features/doctors/services/mockData'
 import { formatCurrency } from '@/features/shared/utils'
+import { IDoctor } from '@/interfaces/doctor'
 
 const bookingFormSchema = z.object({
   appointmentType: z.enum(['online', 'local']),
@@ -28,7 +29,7 @@ const bookingFormSchema = z.object({
 type BookingFormData = z.infer<typeof bookingFormSchema>
 
 interface BookingModalProps {
-  doctor: Doctor
+  doctor: IDoctor
   open: boolean
   onOpenChange: (open: boolean) => void
   onConfirm?: (data: AppointmentFormData & { videoCallId?: string }) => void
@@ -54,7 +55,7 @@ export function BookingModal({
     resolver: zodResolver(bookingFormSchema),
     defaultValues: {
       appointmentType: 'online',
-      place: doctor.currentWorkplace,
+      place: doctor.currentWorkingPlace,
     },
   })
 
@@ -85,7 +86,7 @@ export function BookingModal({
 
     const appointmentData: AppointmentFormData & { videoCallId?: string } = {
       ...data,
-      place: data.appointmentType === 'local' ? data.place || doctor.currentWorkplace : undefined,
+      place: data.appointmentType === 'local' ? data.place || doctor.currentWorkingPlace : undefined,
       videoCallId: generatedVideoCallId,
     }
 
@@ -98,6 +99,8 @@ export function BookingModal({
       onOpenChange(false)
     }, 1000)
   }
+  console.log(doctor);
+  
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -110,15 +113,15 @@ export function BookingModal({
           {/* Doctor Info */}
           <div className="flex items-center gap-4 rounded-lg bg-muted/50 p-4">
             <img
-              src={doctor.image}
+              src={doctor.profilePhoto || ""}
               alt={doctor.name}
               className="h-16 w-16 rounded-lg object-cover"
             />
             <div>
               <h3 className="font-semibold">{doctor.name}</h3>
-              <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
+              <p className="text-sm text-muted-foreground">{doctor.designation}</p>
               <p className="text-sm font-medium text-primary">
-                {formatCurrency(doctor.consultationFee)}
+                {formatCurrency(doctor.appointmentFee)}
               </p>
             </div>
           </div>
@@ -228,9 +231,9 @@ export function BookingModal({
                       <SelectValue placeholder="Choose a time slot" />
                     </SelectTrigger>
                     <SelectContent>
-                      {doctor.availableSlots?.map((slot) => (
-                        <SelectItem key={slot} value={slot}>
-                          {slot}
+                      {doctor.schedule?.map((slot) => (
+                        <SelectItem key={slot.id} value={slot.startDate}>
+                          {slot.startDate}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -260,9 +263,9 @@ export function BookingModal({
                     render={({ field }) => (
                       <Input
                         id="place"
-                        placeholder={doctor.currentWorkplace || 'Enter clinic location'}
+                        placeholder={doctor.currentWorkingPlace || 'Enter clinic location'}
                         {...field}
-                        value={field.value || doctor.currentWorkplace || ''}
+                        value={field.value || doctor.currentWorkingPlace || ''}
                       />
                     )}
                   />

@@ -16,12 +16,12 @@ export default async function ProtectedLayout({
   }
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background w-full">
       <Header />
       <div className="flex">
         <AppSidebar userRole={userData.user.data.role} userName={userData.user.data.name} />
         <div className="flex-1 min-h-[calc(100vh-64px)] w-full">
-          <div className="mx-auto max-w-7xl w-full">
+          <div className=" w-full">
             {children}
           </div>
         </div>

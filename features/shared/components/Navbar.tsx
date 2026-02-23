@@ -19,7 +19,6 @@ export function Navbar() {
   const navLinks = [
     { label: 'Find Doctors', href: '/doctors' },
     { label: 'Roadmap', href: '/roadmap' },
-    { label: 'Appointments', href: '/appointments' },
     { label: 'About', href: '#about' },
   ]
 
@@ -75,12 +74,12 @@ export function Navbar() {
                 )}
               </Button>
             )}
-            <Button variant="outline" asChild>
-              <Link href="/auth">Sign In</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/auth">Get Started</Link>
-            </Button>
+              <Button variant="outline" asChild className="w-full">
+                  <Link href="/sign-in">Sign In</Link>
+                </Button>
+                <Button asChild className="w-full">
+                  <Link href="/sign-up">Get Started</Link>
+                </Button>
           </div>
 
 
@@ -107,10 +106,10 @@ export function Navbar() {
               ))}
               <div className="flex flex-col gap-2 border-t border-border pt-4">
                 <Button variant="outline" asChild className="w-full">
-                  <Link href="/auth">Sign In</Link>
+                  <Link href="/sign-in">Sign In</Link>
                 </Button>
                 <Button asChild className="w-full">
-                  <Link href="/auth">Get Started</Link>
+                  <Link href="/sign-up">Get Started</Link>
                 </Button>
               </div>
             </div>

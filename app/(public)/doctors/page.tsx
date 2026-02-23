@@ -7,9 +7,12 @@ import { Button } from '@/components/ui/button'
 import { DoctorCard } from '@/features/doctors/components/DoctorCard'
 import { DoctorFilters } from '@/features/doctors/components/DoctorFilters'
 import { DoctorGridSkeleton } from '@/features/shared/components/Skeletons'
-import { useDoctorList } from '@/features/doctors/hooks/useDoctorList'
+
 import type { DoctorFilter } from '@/features/shared/types'
 import { CONSULTATION_FEES } from '@/features/shared/constants'
+import { useApiQuery } from '@/hooks/useApiQuery'
+import { queryKeys } from '@/lib/react-query-keys'
+import { IDoctor } from '@/interfaces/doctor'
 
 export default function DoctorsPage() {
   const [filters, setFilters] = useState<DoctorFilter>({
@@ -17,8 +20,19 @@ export default function DoctorsPage() {
     limit: 12,
   })
 
-  const { data: result, isLoading, error } = useDoctorList(filters)
-  const data = result?.data
+  const {data:doctorsList,isLoading,isError} = useApiQuery<{data:{
+    meta:{
+      limit:number;
+      page:number;
+      total:number;
+      totalPage:number;
+    },
+    data:IDoctor[]
+  }}>([queryKeys.FETCH_DOCTOR_LIST],"/api/v1/doctors")
+ 
+  const doctors = doctorsList?.data
+  
+
   const handleSpecialtyChange = useCallback((specialty: string) => {
     setFilters((prev) => ({
       ...prev,
@@ -104,14 +118,14 @@ export default function DoctorsPage() {
             {isLoading && <DoctorGridSkeleton count={12} />}
 
             {/* Doctors Grid */}
-            {!isLoading && data && data.doctors.length > 0 && (
+            {!isLoading && doctors && doctors?.data.length > 0 && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="space-y-8"
               >
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {data.doctors.map((doctor, idx) => (
+                  {doctors.data.map((doctor, idx) => (
                     <motion.div
                       key={doctor.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -127,7 +141,7 @@ export default function DoctorsPage() {
                 <div className="flex items-center justify-between rounded-lg bg-muted/50 p-4">
                   <p className="text-sm text-muted-foreground">
                     Showing {(filters.page! - 1) * filters.limit! + 1} to{' '}
-                    {Math.min(filters.page! * filters.limit!, data.total)} of {data.total} doctors
+                    {Math.min(filters.page! * filters.limit!, doctors.meta.total)} of {doctors.meta.total} doctors
                   </p>
                   <div className="flex gap-2">
                     <Button
@@ -147,7 +161,7 @@ export default function DoctorsPage() {
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">
                         Page {filters.page || 1} of{' '}
-                        {Math.ceil((data.total || 1) / (filters.limit || 12))}
+                        {Math.ceil((doctors.meta.total || 1) / (filters.limit || 12))}
                       </span>
                     </div>
                     <Button
@@ -161,7 +175,7 @@ export default function DoctorsPage() {
                       }
                       disabled={
                         (filters.page || 1) >=
-                        Math.ceil((data.total || 1) / (filters.limit || 12))
+                        Math.ceil((doctors.meta.total || 1) / (filters.limit || 12))
                       }
                     >
                       Next
@@ -173,7 +187,7 @@ export default function DoctorsPage() {
             )}
 
             {/* Empty State */}
-            {!isLoading && data && data.doctors.length === 0 && (
+            {!isLoading && doctors && doctors.data.length === 0 && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -187,7 +201,7 @@ export default function DoctorsPage() {
             )}
 
             {/* Error State */}
-            {error && (
+            {isError && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -199,75 +213,7 @@ export default function DoctorsPage() {
               </motion.div>
             )}
           </div>
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : error ? (
-            <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-6 text-center">
-              <p className="text-destructive font-medium">Failed to load doctors</p>
-              <p className="text-sm text-destructive/70 mt-1">Please try again later</p>
-            </div>
-          ) : data?.doctors && data.doctors.length > 0 ? (
-            <>
-              <div className="mb-4 text-sm text-muted-foreground">
-                Showing {data.doctors.length} of {data.total} doctors
-              </div>
-              <motion.div
-                layout
-                className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
-              >
-                {data.doctors.map((doctor) => (
-                  <DoctorCard
-                    key={doctor.id}
-                    doctor={doctor}
-                    onBook={handleBookAppointment}
-                  />
-                ))}
-              </motion.div>
-
-              {/* Pagination Info */}
-              <div className="mt-8 flex items-center justify-between">
-                <button
-                  onClick={() =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      page: Math.max(1, (prev.page || 1) - 1),
-                    }))
-                  }
-                  disabled={(filters.page || 1) === 1}
-                  className="px-4 py-2 border border-border rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Previous
-                </button>
-                <span className="text-sm text-muted-foreground">
-                  Page {filters.page || 1}
-                </span>
-                <button
-                  onClick={() =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      page: (prev.page || 1) + 1,
-                    }))
-                  }
-                  disabled={
-                    !data?.total ||
-                    ((filters.page || 1) * (filters.limit || 12)) >= data.total
-                  }
-                  className="px-4 py-2 border border-border rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next
-                </button>
-              </div>
-            </>
-          ) : (
-            <div className="rounded-lg border border-dashed border-border p-12 text-center">
-              <p className="text-muted-foreground font-medium">No doctors found</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Try adjusting your filters
-              </p>
-            </div>
-          )}
+          
         </div>
       </div>
     </div>

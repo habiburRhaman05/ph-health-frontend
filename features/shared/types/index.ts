@@ -11,23 +11,7 @@ export interface User {
   updatedAt: string
 }
 
-export interface Doctor {
-  id: string
-  name: string
-  specialty: string
-  gender: 'Male' | 'Female' | 'Other'
-  image: string
-  rating: number
-  reviewsCount: number
-  consultationFee: number
-  experience: number
-  verified: boolean
-  bio?: string
-  qualifications: string[]
-  availableSlots?: string[]
-  currentWorkplace?: string
-  licenseNumber?: string
-}
+
 
 export interface DoctorReview {
   id: string

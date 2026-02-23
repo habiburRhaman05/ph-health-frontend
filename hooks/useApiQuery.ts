@@ -12,7 +12,7 @@ export function useApiQuery<T>(
 
 
   return useQuery<T, Error>({
-    queryKey,
+  queryKey,
     queryFn: async () => {
       try {
         const { data } = await httpClient.get(endpoint);

@@ -28,11 +28,12 @@ export const SIDEBAR_LINKS = {
   ],
   PATIENT: [
     { title: "Dashboard", href: "/dashboard/patient", icon: LayoutDashboard },
-    { title: "Book Appointment", href: "/doctors", icon: Stethoscope },
     { title: "My Appointments", href: "/dashboard/patient/appointments", icon: CalendarDays },
     { title: "Prescriptions", href: "/dashboard/patient/prescriptions", icon: FileText },
     { title: "Medical Reports", href: "/dashboard/patient/reports", icon: Activity },
     { title: "Payments", href: "/dashboard/patient/payments", icon: CreditCard },
     { title: "Profile", href: "/dashboard/patient/profile", icon: UserCircle },
+    { title: "Settings", href: "/dashboard/settings", icon: Settings },
+
   ],
 }

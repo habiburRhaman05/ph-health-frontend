@@ -23,7 +23,7 @@ import {
   Shield,
   ArrowRight,
 } from 'lucide-react'
-import { FeaturedDoctorsCarousel } from '@/features/doctors/components/FeaturedDoctorsCarousel'
+// import { FeaturedDoctorsCarousel } from '@/features/doctors/components/FeaturedDoctorsCarousel'
 import { SPECIALTIES } from '@/features/shared/constants'
 
 const containerVariants = {
@@ -274,7 +274,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             variants={containerVariants}
           >
-            <FeaturedDoctorsCarousel />
+            {/* <FeaturedDoctorsCarousel /> */}
           </motion.div>
         </div>
       </section>
