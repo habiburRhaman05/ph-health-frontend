@@ -4,6 +4,8 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { Toaster } from '@/components/ui/sonner'
+import { getProfile } from '@/features/auth/services/auth.services'
+import UserContextProvider from '@/context/UserContext'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
@@ -19,17 +21,28 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+
+  const response = await getProfile();
+ 
+  
+  const userData = {
+    user: response?.user?.data || null,
+    isLoading: false
+  };
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans mx-auto antialiased bg-background text-foreground`}>
        
         <Providers>
+          
+          <UserContextProvider userData={userData}>
           {children}
+        </UserContextProvider>
         </Providers>
       </body>
     </html>

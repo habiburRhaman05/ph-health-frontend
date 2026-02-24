@@ -1,5 +1,6 @@
 import Header from '@/components/Header';
 import { AppSidebar } from '@/components/Sidebar';
+import UserContextProvider from '@/context/UserContext';
 import { getProfile } from '@/features/auth/services/auth.services';
 import { redirect } from 'next/navigation';
 import React from 'react';
@@ -16,7 +17,8 @@ export default async function ProtectedLayout({
   }
 
   return (
-    <main className="min-h-screen bg-background w-full">
+    <UserContextProvider userData={userData.user.data}>
+      <main className="min-h-screen bg-background w-full">
       <Header />
       <div className="flex">
         <AppSidebar userRole={userData.user.data.role} userName={userData.user.data.name} />
@@ -27,5 +29,6 @@ export default async function ProtectedLayout({
         </div>
       </div>
     </main>
+    </UserContextProvider>
   )
 }

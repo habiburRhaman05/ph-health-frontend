@@ -17,13 +17,15 @@ import type { DoctorReview } from '@/features/shared/types'
 import { useApiQuery } from '@/hooks/useApiQuery'
 import { IDoctor } from '@/interfaces/doctor'
 import { queryKeys } from '@/lib/react-query-keys'
+import { useUser } from '@/context/UserContext'
+import { UserRole } from '@/interfaces/enum'
 
 export default function DoctorProfilePage() {
   const params = useParams()
   const doctorId = params.id as string
   const { toast } = useToast()
   const [bookingOpen, setBookingOpen] = useState(false)
-
+  const {user,isLoading} = useUser()
   // Mapping to your specific API structure
   const { data: response, isLoading: doctorLoading } = useApiQuery<{
     data: IDoctor
@@ -69,7 +71,9 @@ export default function DoctorProfilePage() {
       title: 'Appointment Confirmed',
       description: `Your appointment with ${doctor.name} has been scheduled.`,
     })
-  }
+  };
+
+
 
   // Calculate rating based on JSON "averageRating" or reviews
   const displayRating = doctor.averageRating > 0 
@@ -80,6 +84,8 @@ export default function DoctorProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
+     
+     
       {/* Header */}
       <div className="border-b border-border bg-muted/30 py-6">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -118,7 +124,7 @@ export default function DoctorProfilePage() {
                       <BadgeCheck className="h-6 w-6 text-blue-500" />
                     </h1>
                     <p className="text-lg text-muted-foreground mt-1">
-                      {doctor.designation} — {doctor.specialtys?.[0]?.specialty?.title || 'General'}
+                      {doctor.designation} 
                     </p>
                   </div>
                 </div>
@@ -150,9 +156,15 @@ export default function DoctorProfilePage() {
                   </div>
                 </div>
 
-                <Button size="lg" onClick={() => setBookingOpen(true)} className="w-full sm:w-auto">
+                <Button 
+                disabled={!user || user.role !== UserRole.PATIENT}
+                size="lg" onClick={() => setBookingOpen(true)} className="w-full sm:w-auto">
                   Book Appointment
                 </Button>
+                <p className='text-red-600 font-bold mt-2'>
+                  {!user  ? "Please Login First" : user.role !== UserRole.PATIENT ? "Patient Can Only Book Appointment" : ""
+                
+                  }</p>
               </div>
             </div>
           </div>

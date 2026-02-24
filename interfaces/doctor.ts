@@ -27,11 +27,8 @@ export interface IDoctor {
   createdAt: Date;
   updatedAt: Date;
    reviews?: IReview[];
-   schedule?: ISchedule[];
-  specialtys?: {
-    doctorId:string;
-    specialty:ISpecialty
-  }[]
+   schedules?: ISchedule[];
+ doctorSpecialties:ISpecialty[]
   user:{
     emailVerified:boolean
   }
