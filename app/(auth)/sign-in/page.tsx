@@ -136,13 +136,13 @@ export default function SignInPage() {
               {/* Form Shadow/Glow - Subtle in Light, Visible in Dark */}
               <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 to-blue-500/10 rounded-[2.5rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               
-              <div className="relative rounded-[2rem] border border-border bg-card/70 backdrop-blur-xl p-6 sm:p-8 lg:p-10 shadow-2xl">
+           
+                <SignInForm />
               
 
-                <SignInForm />
 
                
-              </div>
+             
             </div>
 
           

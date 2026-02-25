@@ -20,6 +20,7 @@ import { LoginFormData, LoginSchema } from '../validations'
 import SocialLogin from './SocialLogin'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import SignInSuccessLoader from './SuccessLoader'
 
 export function SignInForm() {
     const router = useRouter()
@@ -68,7 +69,9 @@ export function SignInForm() {
         try {
             const userData = await signInMutation(data);
 
+             
             if (userData?.success) {
+                toast.success("You are Login Successfully")
                 const role = userData.data.user.role;
                 
                 let url = "/dashboard";
@@ -92,32 +95,14 @@ export function SignInForm() {
             {/* Full Screen Pre-loader */}
             <AnimatePresence>
                 {showLoading && (
-                    <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background/80 backdrop-blur-md"
-                    >
-                        <div className="flex flex-col items-center gap-4">
-                            <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-xl shadow-primary/20">
-                                <Activity className="h-8 w-8 text-primary-foreground animate-pulse" />
-                            </div>
-                            <div className="flex flex-col items-center gap-1">
-                                <h3 className="text-lg font-bold tracking-tight">Preparing your portal</h3>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
-                                    <Loader2 className="h-3 w-3 animate-spin" />
-                                    <span>Redirecting...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
+                   <SignInSuccessLoader/>
                 )}
             </AnimatePresence>
 
             <motion.div
                 initial={{ opacity: 1 }}
                 animate={{ opacity: showLoading ? 0 : 1 }} // Fade out form when loader appears
-                className="w-full"
+                className="rounded-[2rem] border border-border bg-card/70 backdrop-blur-xl p-6 sm:p-8 lg:p-10 shadow-2xl"
             >
                 <div className="mb-8 text-center lg:text-left">
                     <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Sign In</h2>
