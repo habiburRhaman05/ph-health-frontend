@@ -6,34 +6,29 @@ import {
 } from "lucide-react"
 
 export const SIDEBAR_LINKS = {
-  SUPER_ADMIN: [
-    { title: "Dashboard", href: "/dashboard/super-admin", icon: LayoutDashboard },
-    { title: "Manage Admins", href: "/dashboard/super-admin/admins", icon: UserCog },
-    { title: "System Logs", href: "/dashboard/super-admin/logs", icon: ShieldAlert },
-    { title: "Settings", href: "/dashboard/super-admin/settings", icon: Settings },
-  ],
   ADMIN: [
-    { title: "Dashboard", href: "/dashboard/admin", icon: LayoutDashboard },
-    { title: "Doctors", href: "/dashboard/admin/doctors", icon: Stethoscope },
-    { title: "Patients", href: "/dashboard/admin/patients", icon: Users },
-    { title: "Appointments", href: "/dashboard/admin/appointments", icon: CalendarDays },
-    { title: "Specialties", href: "/dashboard/admin/specialties", icon: Activity },
-    { title: "Payments", href: "/dashboard/admin/payments", icon: CreditCard },
+    { title: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    { title: "Doctors", href: "/admin/dashboard/doctors", icon: Stethoscope },
+    { title: "Patients", href: "/admin/dashboard/patients", icon: Users },
+    { title: "Appointments", href: "/admin/dashboard/appointments", icon: CalendarDays },
+    { title: "Specialties", href: "/admin/dashboard/specialties", icon: Activity },
+    { title: "System Logs", href: "/admin/dashboard/logs", icon: ShieldAlert },
+    { title: "Payments", href: "/admin/dashboard/payments", icon: CreditCard },
   ],
   DOCTOR: [
-    { title: "Dashboard", href: "/dashboard/doctor", icon: LayoutDashboard },
-    { title: "My Schedule", href: "/dashboard/doctor/schedule", icon: CalendarDays },
-    { title: "Appointments", href: "/dashboard/doctor/appointments", icon: History },
-    { title: "Prescriptions", href: "/dashboard/doctor/prescriptions", icon: FileText },
+    { title: "Dashboard", href: "/doctor/dashboard", icon: LayoutDashboard },
+    { title: "My Schedule", href: "/doctor/dashboard/schedule", icon: CalendarDays },
+    { title: "Appointments", href: "/doctor/dashboard/appointments", icon: History },
+    { title: "Prescriptions", href: "/doctor/dashboard/prescriptions", icon: FileText },
   ],
   PATIENT: [
-    { title: "Dashboard", href: "/dashboard/patient", icon: LayoutDashboard },
-    { title: "My Appointments", href: "/dashboard/patient/appointments", icon: CalendarDays },
-    { title: "Prescriptions", href: "/dashboard/patient/prescriptions", icon: FileText },
-    { title: "Medical Reports", href: "/dashboard/patient/reports", icon: Activity },
-    { title: "Payments", href: "/dashboard/patient/payments", icon: CreditCard },
-    { title: "Profile", href: "/dashboard/patient/profile", icon: UserCircle },
-    { title: "Settings", href: "/dashboard/settings", icon: Settings },
+    { title: "Dashboard", href: "/patient/dashboard", icon: LayoutDashboard },
+    { title: "My Appointments", href: "/patient/dashboard/appointments", icon: CalendarDays },
+    { title: "Prescriptions", href: "/patient/dashboard/prescriptions", icon: FileText },
+    { title: "Medical Reports", href: "/patient/dashboard/reports", icon: Activity },
+    { title: "Payments", href: "/patient/dashboard/payments", icon: CreditCard },
+    { title: "Profile", href: "/patient/dashboard/profile", icon: UserCircle },
+    { title: "Settings", href: "/patient/dashboard/settings", icon: Settings },
 
   ],
 }

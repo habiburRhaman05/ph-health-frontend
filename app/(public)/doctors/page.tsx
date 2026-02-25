@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DoctorCard } from '@/features/doctors/components/DoctorCard'
 import { DoctorFilters } from '@/features/doctors/components/DoctorFilters'
-import { DoctorGridSkeleton } from '@/features/shared/components/Skeletons'
+import { DoctorGridSkeleton } from '@/features/doctors/components/DoctorsSkelections'
 
 import type { DoctorFilter } from '@/features/shared/types'
 import { CONSULTATION_FEES } from '@/features/shared/constants'

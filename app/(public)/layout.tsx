@@ -1,6 +1,6 @@
 import React from 'react'
-import { Navbar } from '@/features/shared/components/Navbar'
-import { Footer } from '@/features/shared/components/Footer'
+import { Navbar } from '@/components/Navbar'
+import { Footer } from '@/components/Footer'
 import { getProfile } from '@/features/auth/services/auth.services';
 import UserContextProvider from '@/context/UserContext';
 

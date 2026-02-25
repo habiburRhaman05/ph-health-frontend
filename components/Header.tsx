@@ -6,8 +6,8 @@ import { useState } from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const navLinks = [
-  { id: 1, name: "Find Tutors", path: "/tutors" },
-  { id: 2, name: "Become a Tutor", path: "/sign-up" },
+  { id: 1, name: "Find Doctors", path: "/doctors" },
+  { id: 2, name: "Explore Tests", path: "/sign-up" },
   { id: 3, name: "About Us", path: "/about-us" },
 ];
 
@@ -24,6 +24,9 @@ export default function Header() {
           )}
           nav links
           
+          <div className="md:hidden">
+            menu
+          </div>
   
       </div>
     </header>

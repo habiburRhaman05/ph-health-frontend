@@ -23,8 +23,6 @@ import {
   Shield,
   ArrowRight,
 } from 'lucide-react'
-// import { FeaturedDoctorsCarousel } from '@/features/doctors/components/FeaturedDoctorsCarousel'
-import { SPECIALTIES } from '@/features/shared/constants'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -189,11 +187,8 @@ export default function HomePage() {
                       <SelectValue placeholder="Select specialty" />
                     </SelectTrigger>
                     <SelectContent>
-                      {SPECIALTIES.map((specialty) => (
-                        <SelectItem key={specialty} value={specialty}>
-                          {specialty}
-                        </SelectItem>
-                      ))}
+                      fetch all specialitys
+                     
                     </SelectContent>
                   </Select>
                   <Input placeholder="Search by doctor name..." className="border-0" />
