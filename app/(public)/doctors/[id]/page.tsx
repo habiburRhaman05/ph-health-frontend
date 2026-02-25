@@ -33,13 +33,7 @@ export default function DoctorProfilePage() {
 
   const doctor = response?.data
 
-  const { data: reviews = [] } = useQuery<DoctorReview[]>({
-    queryKey: ['doctorReviews', doctorId],
-    queryFn: async () => {
-      return getMockReviewsForDoctor(doctorId)
-    },
-    enabled: !!doctor,
-  })
+
 
   if (doctorLoading) {
     return (
@@ -66,21 +60,10 @@ export default function DoctorProfilePage() {
     )
   }
 
-  const handleBookingConfirm = (data: any) => {
-    toast({
-      title: 'Appointment Confirmed',
-      description: `Your appointment with ${doctor.name} has been scheduled.`,
-    })
-  };
+ 
 
 
 
-  // Calculate rating based on JSON "averageRating" or reviews
-  const displayRating = doctor.averageRating > 0 
-    ? doctor.averageRating.toFixed(1) 
-    : reviews.length > 0 
-      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
-      : "0.0"
 
   return (
     <div className="min-h-screen bg-background">
@@ -144,9 +127,9 @@ export default function DoctorProfilePage() {
                     <p className="text-xs text-muted-foreground mb-1">Rating</p>
                     <div className="flex items-center gap-1">
                       <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                      <span className="text-lg font-semibold">{displayRating}</span>
+                      <span className="text-lg font-semibold">{doctor.reviews?.length}</span>
                       <span className="text-sm text-muted-foreground">
-                        ({reviews.length} reviews)
+                        ({doctor.reviews?.length} reviews)
                       </span>
                     </div>
                   </div>
@@ -213,13 +196,13 @@ export default function DoctorProfilePage() {
 
           {/* Reviews Section */}
           <div className="rounded-lg border border-border bg-card p-6">
-            <h2 className="text-xl font-semibold mb-6">Patient Reviews ({reviews.length})</h2>
-            {reviews.length > 0 ? (
+            <h2 className="text-xl font-semibold mb-6">Patient Reviews ({doctor.reviews?.length})</h2>
+            {doctor.reviews && doctor?.reviews?.length > 0 ? (
               <div className="space-y-6">
-                {reviews.map((review, idx) => (
+                {doctor.reviews?.map((review, idx) => (
                   <div key={review.id} className="border-b last:border-0 pb-4 last:pb-0">
                     <div className="flex justify-between mb-2">
-                      <p className="font-medium">{review.patientName}</p>
+                      <p className="font-medium">{review.patient?.name}</p>
                       <div className="flex items-center gap-1">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                         <span className="text-sm font-bold">{review.rating}</span>
@@ -240,7 +223,6 @@ export default function DoctorProfilePage() {
         doctor={doctor}
         open={bookingOpen}
         onOpenChange={setBookingOpen}
-        onConfirm={handleBookingConfirm}
       />
     </div>
   )

@@ -29,7 +29,7 @@ export function useApiMutation<TData = any, TVariables = any, TContext = unknown
       return response.data;
     },
     onSuccess: (data:any, variables, context) => {
-      toast.success(data.message || "Action completed successfully");
+      toast.success(successMessage || data.message || "Action completed successfully");
       if (invalidateKeys) {
         invalidateKeys.forEach((key) => {
           queryClient.invalidateQueries({ queryKey:[key] });
@@ -38,6 +38,7 @@ export function useApiMutation<TData = any, TVariables = any, TContext = unknown
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: any, variables, context) => {
+  console.log(error);
   
       const message =error.response?.data?.error.message || error.response?.data?.message || "Something went wrong. Please try again.";
       console.log(message);
