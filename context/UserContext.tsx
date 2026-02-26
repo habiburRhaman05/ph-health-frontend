@@ -19,6 +19,7 @@ interface IProps {
 }
 
 const UserContextProvider = ({ children, userData }: IProps) => {
+console.log("user",userData.user?.email);
 
   return (
     <UserContext.Provider value={userData}>

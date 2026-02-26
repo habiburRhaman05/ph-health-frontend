@@ -12,7 +12,7 @@ const UserProfile = ({user}:{user:IUser}) => {
                 <PopoverTrigger asChild>
                   <button className="flex items-center outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring rounded-full">
                     <Avatar className="h-9 w-9 border-2 border-primary/10 hover:border-primary/50 transition-all shadow-sm">
-                      <AvatarImage src={user.image} alt={user.name} />
+                      <AvatarImage src={user?.image || ""} alt={user.name} />
                       <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold uppercase">
                         {user.name?.charAt(0)}
                       </AvatarFallback>

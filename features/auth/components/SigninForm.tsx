@@ -75,9 +75,9 @@ export function SignInForm() {
                 const role = userData.data.user.role;
                 
                 let url = "/dashboard";
-                if (role === "PATIENT") url = "/dashboard/patient";
-                else if (role === "DOCTOR") url = "/dashboard/doctor";
-                else if (role === "ADMIN") url = "/dashboard/admin";
+                if (role === "PATIENT") url = "/patient/dashboard";
+                else if (role === "DOCTOR") url = "/doctor/dashboard";
+                else if (role === "ADMIN") url = "/admin/dashboard";
 
                 // We keep showLoading true while Next.js finishes the push
                 router.push(url);

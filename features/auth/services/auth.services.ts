@@ -1,5 +1,6 @@
 "use server"
 import { envVeriables } from "@/config/envVariables"
+import { IUser } from "@/interfaces/user";
 import httpClient from "@/lib/axios-client"
 import { cookies } from "next/headers"
 
