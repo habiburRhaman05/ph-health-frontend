@@ -12,3 +12,4 @@ date - 26-02-26
 .both page must be responseive and 
 .cancel appointment
 .pay now (pay latar ) add 
+.add site meta data and assest
