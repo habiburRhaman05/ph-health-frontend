@@ -10,7 +10,7 @@ export async function GET(req: Request) {
 
     // 2. Call backend logout API
     const backendRes = await fetch(
-      `${envVeriables.NEXT_PUBLIC_API_URL}/api/v1/auth/logout`,
+      `${envVeriables.NEXT_PUBLIC_API_URL}/auth/logout`,
       {
         method: "GET",
         headers: { 

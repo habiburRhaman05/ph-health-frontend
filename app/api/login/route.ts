@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 
     // Call backend API
     const backendRes = await fetch(
-      `${envVeriables.NEXT_PUBLIC_API_URL}/api/v1/auth/login`,
+      `${envVeriables.NEXT_PUBLIC_API_URL}/auth/login`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

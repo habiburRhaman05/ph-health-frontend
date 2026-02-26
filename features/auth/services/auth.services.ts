@@ -6,7 +6,7 @@ import { cookies } from "next/headers"
 
 export const getProfile = async ():Promise<{user:{data:any}} | null> => {
      const cookieStore = await cookies();
-  const res = await fetch(`${envVeriables.NEXT_PUBLIC_API_URL}/api/v1/auth/me`, {
+  const res = await fetch(`${envVeriables.NEXT_PUBLIC_API_URL}/auth/me`, {
     headers: {
       cookie: cookieStore.toString(),
     },
