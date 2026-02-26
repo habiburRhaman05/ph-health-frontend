@@ -1,7 +1,7 @@
 import Header from '@/components/Header';
 import { AppSidebar } from '@/components/Sidebar';
-import UserContextProvider from '@/context/UserContext';
 import { getProfile } from '@/features/auth/services/auth.services';
+import { UserRole } from '@/interfaces/enum';
 import { redirect } from 'next/navigation';
 import React from 'react';
 
@@ -15,9 +15,11 @@ export default async function ProtectedLayout({
   if (!userData?.user.data) {
     redirect("/sign-in")
   }
-
+  if (userData?.user?.data?.role !== UserRole.PATIENT) {
+    redirect(`/`)
+  }
+ 
   return (
-    <UserContextProvider userData={userData.user.data}>
       <main className="min-h-screen bg-background w-full">
       <Header />
       <div className="flex">
@@ -29,6 +31,5 @@ export default async function ProtectedLayout({
         </div>
       </div>
     </main>
-    </UserContextProvider>
   )
 }

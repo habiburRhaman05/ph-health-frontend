@@ -6,6 +6,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import ApppointmentDetailsSkelection from '@/features/appointments/components/ApppointmentDetailsSkelection'
 import { useGetAppointment } from '@/hooks/appointments/useGetAppointment'
+import { useApiQuery } from '@/hooks/useApiQuery'
+import { queryKeys } from '@/lib/react-query-keys'
 import { motion } from 'framer-motion'
 import {
     Activity,
@@ -19,6 +21,9 @@ import {
 export default function AppointmentDetailsPage({ params }: { params: { id: string } }) {
   const { data: res, isLoading } = useGetAppointment(params.id)
   const appointment = res?.data
+
+
+  
 
   if (isLoading) return <ApppointmentDetailsSkelection />
 
@@ -36,7 +41,7 @@ export default function AppointmentDetailsPage({ params }: { params: { id: strin
               <ArrowLeft className="h-5 w-5 text-primary" />
             </Button>
             <div>
-              <h1 className="text-2xl font-black tracking-tighter italic uppercase">Summary</h1>
+              <h1 className="text-2xl   font-black">Appointment Details</h1>
               <p className="text-muted-foreground text-[10px] font-bold tracking-widest">ID: {appointment.id}</p>
             </div>
           </div>

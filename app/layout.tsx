@@ -34,6 +34,8 @@ export default async function RootLayout({
     user: response?.user?.data || null,
     isLoading: false
   };
+
+  
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans mx-auto antialiased bg-background text-foreground`}>
