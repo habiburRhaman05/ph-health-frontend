@@ -1,8 +1,9 @@
 import { useApiQuery } from "@/hooks/useApiQuery"
-import { queryKeys } from "@/lib/react-query-keys"
 
 interface AppointmentFilters {
   page?: number
+  appointmentDeatils?:boolean
+  appointmentsList?:boolean
   status?: string
 
   q?: string
@@ -15,13 +16,13 @@ export function useAppointments(filters: AppointmentFilters) {
   if (filters.status) queryParams.append("status", filters.status)
   if (filters.q) queryParams.append("q", filters.q)
 
- 
+ const queryKey = queryParams.toString();
   const {data,isLoading,isError} = useApiQuery<any[]>(
-    ["queryKey"],
+    [queryKey],
     `appointments/patient/my-appointments?${queryParams.toString()}`,
     "axios",
-    { staleTime: 60 * 1000 }
-  )
+    { staleTime: 60 * 1000,enabled:filters.appointmentsList}
+  );
 
   return {
     appointments:data?.data || [],

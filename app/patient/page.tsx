@@ -6,7 +6,7 @@ const page = async () => {
     
      
   return (
-    <div>
+    <div className='bg-success'>
         welcome {user?.user.data.name}
     </div>
   )

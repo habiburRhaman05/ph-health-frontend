@@ -25,6 +25,7 @@ const AppointmentGridWrapper = () => {
 
   // Fetch appointments
   const { appointments, appointmentsFetching, paginationData } = useAppointments({
+    appointmentsList:true,
     page: currentPage,
     status,
     q

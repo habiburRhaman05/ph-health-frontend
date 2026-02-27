@@ -2,6 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AppointmentStatus } from "@/interfaces/enum";
 import { useQueryClient } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -20,25 +21,23 @@ const AppointmentsFilterBar = () => {
     [searchParams]
   );
 
-  const status = searchParams.get("status") || "upcoming";
+  const status = searchParams.get("status") || AppointmentStatus.SCHEDULED;
 
-  // Debounced search
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (searchQuery) {
+  const handleSearch = (e:React.KeyboardEvent) =>{
+     if(e.key === "Enter"){
+          if (searchQuery) {
         params.set("q", searchQuery);
       } else {
         params.delete("q");
       }
       router.push(`${pathname}?${params.toString()}`);
-       setTimeout(() => {
-       queryClient.resetQueries()
-    }, 200);
+    //    setTimeout(() => {
+    //    queryClient.resetQueries()
+    // }, 200);
 
-    }, 400);
+     }
+  }
 
-    return () => clearTimeout(timeout);
-  }, [searchQuery]);
 
   return (
     <div className="flex flex-col md:flex-row gap-4">
@@ -49,26 +48,52 @@ const AppointmentsFilterBar = () => {
           className="pl-10 h-10 bg-card"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e)=>{
+            handleSearch(e)
+          }}
         />
       </div>
 
       <Tabs
+      
         value={status}
         onValueChange={(value) => {
           params.set("status", value);
           router.push(`${pathname}?${params.toString()}`);
-      setTimeout(() => {
-       queryClient.resetQueries()
-    }, 200);
-
         }}
       >
-        <TabsList className="bg-muted/50 h-10">
-          <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-          <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
-          <TabsTrigger value="all">All</TabsTrigger>
-        </TabsList>
+  <TabsList className="bg-muted/50 h-10 p-1 border border-border/50">
+  <TabsTrigger 
+  
+    value={AppointmentStatus.SCHEDULED}
+    className="rounded-md px-4 transition-all
+               data-[state=active]:bg-primary 
+               data-[state=active]:text-primary-foreground 
+               data-[state=active]:shadow-sm"
+  >
+    Upcoming
+  </TabsTrigger>
+
+  <TabsTrigger 
+    value={AppointmentStatus.COMPLETED}
+    className="rounded-md px-4 transition-all
+               data-[state=active]:bg-primary 
+               data-[state=active]:text-primary-foreground 
+               data-[state=active]:shadow-sm"
+  >
+    Completed
+  </TabsTrigger>
+
+  <TabsTrigger 
+    value={AppointmentStatus.CANCELLED}
+    className="rounded-md px-4 transition-all
+               data-[state=active]:bg-primary 
+               data-[state=active]:text-primary-foreground 
+               data-[state=active]:shadow-sm"
+  >
+    Cancelled
+  </TabsTrigger>
+</TabsList>
       </Tabs>
     </div>
   );

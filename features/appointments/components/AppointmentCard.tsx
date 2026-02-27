@@ -8,12 +8,14 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useApiMutation } from "@/hooks/useApiMutation"
 import { motion } from "framer-motion"
 import {
     AlertCircle,
     Calendar,
     CheckCircle2,
     CreditCard,
+    Loader2,
     MapPin,
     MoreHorizontal,
     Video,
@@ -31,21 +33,37 @@ const statusConfig: Record<string, { label: string; icon: React.ElementType; cla
 }
 
 const paymentStatusConfig: Record<string, { label: string; className: string }> = {
-  PAID: { label: "Paid", className: "bg-green-500/10 text-green-700 dark:text-green-400 border-none" },
+  COMPLETE: { label: "Paid", className: "bg-green-500/10 text-green-700 dark:text-green-400 border-none" },
   PENDING: { label: "Unpaid", className: "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-none" },
   FAILED: { label: "Payment Failed", className: "bg-red-500/10 text-red-600 border-none" },
 }
 
 const AppointmentCard = ({apt}:{apt:any}) => {
 
-  console.log(".....card.tsx");
+
 
          const status = statusConfig[apt.status] || statusConfig.PENDING
             const payment = paymentStatusConfig[apt.paymentStatus] || paymentStatusConfig.PENDING
-            const StatusIcon = status.icon
+            const StatusIcon = status.icon;
+
+
+              const payLaterMutation = useApiMutation({
+    method:"POST",
+    endpoint:`/appointments/pay-later/${apt.id}`
+  });
+
+  const payLatarHandler = async()=>{
+    const result = await payLaterMutation.mutateAsync({});
+console.log(result);
+
+    if(result.success){
+    window.location.href = result.data.paymentUrl
+    }
+  }
 
   return (
       <motion.div
+      
                  key={apt.id}
                  layout
                  className="rounded-xl border border-border bg-card p-5 hover:shadow-md transition-all"
@@ -106,16 +124,15 @@ const AppointmentCard = ({apt}:{apt:any}) => {
                      <span className="text-sm font-bold text-primary">${apt.doctor.appointmentFee}</span>
                    </div>
                    <div className="flex gap-2">
-                     {apt.paymentStatus === "PENDING" ? (
-                       <Button size="sm" className="h-8 text-xs bg-blue-600 hover:bg-blue-700">Pay Now</Button>
-                     ) : (
-                       apt.status === "SCHEDULED" && (
-                         <Button size="sm" variant="outline" className="h-8 text-xs border-primary text-primary hover:bg-primary/5">
-                           Join Call
-                         </Button>
-                       )
+                     {apt.paymentStatus === "PENDING" && (
+                       <Button
+                       onClick={payLatarHandler}
+                       disabled={payLaterMutation.isPending}
+                       size="sm" className="h-8 text-xs bg-blue-600 hover:bg-blue-700">
+                        Pay Now {payLaterMutation.isPending && <Loader2 className="ml-3 animate-spin"/>}
+                       </Button>
                      )}
-                     <Button asChild size="sm" variant="secondary" className="h-8 text-xs">
+                     <Button asChild size="sm" variant="secondary" className="bg-background h-8 text-xs">
                         <Link href={`/patient/dashboard/appointments/${apt.id}`}>Details</Link>
                      </Button>
                    </div>

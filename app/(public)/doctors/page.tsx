@@ -28,7 +28,7 @@ export default function DoctorsPage() {
       totalPage:number;
     },
     data:IDoctor[]
-  }}>([queryKeys.FETCH_DOCTOR_LIST],"/api/v1/doctors")
+  }}>([queryKeys.FETCH_DOCTOR_LIST],"/doctors","axios")
  
   const doctors = doctorsList?.data
   

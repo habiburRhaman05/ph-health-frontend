@@ -15,3 +15,10 @@ export enum UserRole {
   ADMIN = 'ADMIN',
   SUPER_ADMIN = 'SUPER_ADMIN'
 }
+
+export enum AppointmentStatus {
+   PENDING = "PENDING",
+    SCHEDULED="SCHEDULED",
+    COMPLETED="COMPLETED",
+    CANCELLED="CANCELLED",
+}
