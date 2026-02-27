@@ -10,7 +10,8 @@ date - 26-02-26
 . try to improve more data cache and fetching logic
 .appointments details page full implement with dynamic data fetch
 .both page must be responseive and  // done
-.re-facotr the appointments details page code and rgba(208, 16, 16, 1)
-.cancel appointment
+.re-facotr the appointments details page code and rgba(208, 16, 16, 1) -done
+.cancel appointment --done 
 .pay now (pay latar ) add // done
 .add site meta data and assest
+.appointment details status dynamic colors
