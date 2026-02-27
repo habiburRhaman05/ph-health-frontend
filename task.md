@@ -9,7 +9,8 @@ date - 26-02-26
 .complete appointments page full complete like (add dynamic url query filter,re-factore-code-base) -- done
 . try to improve more data cache and fetching logic
 .appointments details page full implement with dynamic data fetch
-.both page must be responseive and 
+.both page must be responseive and  // done
+.re-facotr the appointments details page code and components
 .cancel appointment
-.pay now (pay latar ) add 
+.pay now (pay latar ) add // done
 .add site meta data and assest
