@@ -14,4 +14,4 @@ date - 26-02-26
 .cancel appointment --done 
 .pay now (pay latar ) add // done
 .add site meta data and assest
-.appointment details status dynamic colors
+.appointment details status dynamic colors -- done 
