@@ -48,7 +48,7 @@ export function SignupForm() {
 
   const { mutateAsync: handleSignup, isPending: isLoading } = useApiMutation({
     method: "POST",
-    endpoint: "/api/v1/auth/register",
+    endpoint: "/auth/register",
   })
 
   async function onSubmit(data: PatientSignupFormData | DoctorSignupFormData) {

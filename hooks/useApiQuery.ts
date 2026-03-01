@@ -35,7 +35,7 @@ export function useApiQuery<T>(
           return res.json();
         }
       } catch (error: any) {
-        toast.error("Fetch Error");
+        // toast.error("Fetch Error");
         throw error;
       }
     },

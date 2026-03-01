@@ -1,8 +1,15 @@
-// constants/navigation.ts
-import { 
-  LayoutDashboard, Users, UserCog, Stethoscope, 
-  CalendarDays, FileText, CreditCard, Activity,
-  Settings, ShieldAlert, History, UserCircle
+
+import {
+  Activity,
+  CalendarDays,
+  CreditCard,
+  FileText,
+  History,
+  LayoutDashboard,
+  Settings, ShieldAlert,
+  Stethoscope,
+  UserCircle,
+  Users
 } from "lucide-react"
 
 export const SIDEBAR_LINKS = {

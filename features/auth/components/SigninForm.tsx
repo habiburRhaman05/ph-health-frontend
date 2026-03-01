@@ -21,6 +21,10 @@ import SocialLogin from './SocialLogin'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import SignInSuccessLoader from './SuccessLoader'
+import { handleLogin } from '../services/auth.services'
+import { FormInput } from '@/components/forms/InputFeild'
+import { FormPassword } from '@/components/forms/PasswordFeild'
+import FormSubmitButton from '@/components/forms/FromSubmitButton'
 
 export function SignInForm() {
     const router = useRouter()
@@ -42,19 +46,10 @@ export function SignInForm() {
 
     const { mutateAsync: signInMutation, isPending: isLoading } = useMutation({
         mutationFn: async (data: LoginFormData) => {
-            const res = await fetch(`/api/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify(data),
-            });
+           const result = await handleLogin(data);
+console.log(result);
 
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                throw new Error(errorData.message || "Login failed");
-            }
-
-            return res.json();
+         return result
         },
         onError: (error) => {
             toast.error(error.message)
@@ -72,7 +67,7 @@ export function SignInForm() {
              
             if (userData?.success) {
                 toast.success("You are Login Successfully")
-                const role = userData.data.user.role;
+                const role = userData.user.role;
                 
                 let url = "/dashboard";
                 if (role === "PATIENT") url = "/patient/dashboard";
@@ -81,6 +76,10 @@ export function SignInForm() {
 
                 // We keep showLoading true while Next.js finishes the push
                 router.push(url);
+            }else{
+                toast.error(userData.message)
+            setShowLoading(false) // Hide loader if logic fails after success
+
             }
         } catch (error) {
             console.error("Login Error:", error);
@@ -111,58 +110,30 @@ export function SignInForm() {
 
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-sm">Email</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="email"
-                                            placeholder="example@gmail.com"
-                                            {...field}
-                                            disabled={isLoading || showLoading}
-                                            className="h-10"
-                                        />
-                                    </FormControl>
-                                    <FormMessage className="text-xs" />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-sm">Password</FormLabel>
-                                    <FormControl>
-                                        <div className="relative">
-                                            <Input
-                                                type={showPassword ? 'text' : 'password'}
-                                                placeholder="••••••••"
-                                                {...field}
-                                                disabled={isLoading || showLoading}
-                                                className="h-10"
-                                            />
-                                            <button
-                                                type="button"
-                                                disabled={isLoading || showLoading}
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                                            >
-                                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                            </button>
-                                        </div>
-                                    </FormControl>
-                                    <FormMessage className="text-xs" />
-                                </FormItem>
-                            )}
-                        />
 
-                        <Button type="submit" className="w-full h-11 font-bold" disabled={isLoading || showLoading}>
-                            {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : 'Sign In'}
-                        </Button>
+  <FormInput
+      control={form.control}
+      name="email"
+      label="Email"
+      type="email"
+      placeholder="example@gmail.com"
+      disabled={isLoading}
+    />
+
+    <FormPassword
+      control={form.control}
+      name="password"
+      label="Password"
+      disabled={isLoading}
+    />
+
+                  
+                        <FormSubmitButton
+                        text='Sign In'
+                        className='w-full h-11 font-bold'
+                        disabled={isLoading || showLoading}
+                        isLoading={isLoading}
+                        />
 
                         <p className="text-center text-xs text-muted-foreground py-2 font-medium">
                             Don't have an account?{' '}
