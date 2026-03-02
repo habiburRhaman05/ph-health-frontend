@@ -38,12 +38,12 @@ export function BookingModal({ doctor, open, onOpenChange }: BookingModalProps) 
   const { user } = useUser()
 
      const bookAppointmentMutation = useApiMutation({
-        endpoint:"/api/v1/appointments",
+        endpoint:"/appointments",
         method:"POST",
         invalidateKeys:[queryKeys.getDocotrIdKeys(doctor.id)]
     });
     const bookAppointmentWithPayLatarMutation = useApiMutation({
-        endpoint:"/api/v1/appointments/book-with-pay-later",
+        endpoint:"/appointments/book-with-pay-later",
         method:"POST",
         successMessage:"Appointment Reserved! Please pay within 24 hours.",
         invalidateKeys:[queryKeys.getDocotrIdKeys(doctor.id)]
