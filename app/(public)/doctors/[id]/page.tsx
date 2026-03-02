@@ -26,7 +26,7 @@ export default function DoctorProfilePage() {
   // Mapping to your specific API structure
   const { data: response, isLoading: doctorLoading } = useApiQuery<{
     data: IDoctor
-  }>([queryKeys.getDocotrIdKeys(doctorId)], `/api/v1/doctors/${doctorId}`)
+  }>([queryKeys.getDocotrIdKeys(doctorId)], `/doctors/${doctorId}`)
 
   const doctor = response?.data
 
