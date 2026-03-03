@@ -2,7 +2,8 @@
 
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { setCookie } from "./cookie";
-import { envVeriables } from "@/config/envVariables";
+import { envVeriables } from "../config/envVariables";
+import { UserRole } from "@/features/shared/types";
 
 
 const getTokenSecondsRemaining =  (token: string): number => {
@@ -28,9 +29,24 @@ const getTokenSecondsRemaining =  (token: string): number => {
 export const setTokenInCookies = async (
     name : string,
     token : string,
-    fallbackMaxAgeInSeconds = 60 * 60 * 24 // 1 days
+    fallbackMaxAgeInSeconds:number
 ) => {
-    const maxAgeInSeconds = getTokenSecondsRemaining(token);
-
-    await setCookie(name, token, maxAgeInSeconds || fallbackMaxAgeInSeconds);
+   
+    await setCookie(name, token, fallbackMaxAgeInSeconds);
 }
+
+export const decodeToken = async(token:string):Promise<{user:{role:UserRole;name:string,email:string}  | null}> =>{
+    try {
+        // const isvalidToken = jwt.verify(token,envVeriables.JWT_ACCESS_SECRET!);
+           const userdata = jwt.decode(token) as {role:UserRole;name:string,email:string}
+        return {
+            user:userdata || null
+        }
+      
+    } catch (error) {
+          return {
+              user: null,
+           
+          }
+    }
+} 

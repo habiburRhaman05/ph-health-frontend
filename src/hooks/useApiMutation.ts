@@ -25,6 +25,7 @@ export function useApiMutation<TData = any, TVariables = any, TContext = unknown
         url: endpoint,
         method,
         data: payload,
+
       });
       return response.data;
     },
