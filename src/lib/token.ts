@@ -49,4 +49,12 @@ export const decodeToken = async(token:string):Promise<{user:{role:UserRole;name
            
           }
     }
-} 
+}
+// export default async function OrdersPage() {
+//   const res = await serverFetch("/orders")
+//   if (!res.ok) throw new Error("Failed to load")
+//   const orders = await res.json()
+//   return (
+//     <div>{orders.map((o: any) => <div key={o.id}>{o.title}</div>)}</div>
+//   )
+// }

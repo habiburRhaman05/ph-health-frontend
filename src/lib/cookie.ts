@@ -14,7 +14,7 @@ export const setCookie = async (
         secure : true,
         sameSite : "strict",
         path : "/",
-        maxAge : 2*60,
+        maxAge : maxAgeInSeconds,
     })
 }
 

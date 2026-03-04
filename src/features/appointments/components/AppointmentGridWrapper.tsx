@@ -21,10 +21,10 @@ const AppointmentGridWrapper = () => {
   const q = searchParams.get('q') || "";
 
   const [currentPage, setCurrentPage] = useState(pageFromUrl);
-  const queryClient =  useQueryClient()
+  // const queryClient =  useQueryClient()
 
   // Fetch appointments
-  const { appointments, appointmentsFetching, paginationData } = useAppointments({
+  const { appointments, appointmentsFetching } = useAppointments({
     appointmentsList:true,
     page: currentPage,
     status,
@@ -32,28 +32,26 @@ const AppointmentGridWrapper = () => {
   });
 
   
-  
-
   // Pagination handler
-  const handlePagination = (value: number, type: "next" | "prev" | "specific") => {
-    if (!paginationData) return;
+  // const handlePagination = (value: number, type: "next" | "prev" | "specific") => {
+  //   if (!paginationData) return;
 
-    let newPage = currentPage;
-    if (type === "prev") newPage = Math.max(currentPage - 1, 1);
-    else if (type === "next") newPage = Math.min(currentPage + 1, paginationData.totalPage);
-    else if (type === "specific") newPage = value;
+  //   let newPage = currentPage;
+  //   if (type === "prev") newPage = Math.max(currentPage - 1, 1);
+  //   else if (type === "next") newPage = Math.min(currentPage + 1, paginationData.totalPage);
+  //   else if (type === "specific") newPage = value;
 
-    if (newPage !== currentPage) setCurrentPage(newPage);
+  //   if (newPage !== currentPage) setCurrentPage(newPage);
 
-    router.push(`${path}?page=${newPage}`);
+  //   router.push(`${path}?page=${newPage}`);
 
-    setTimeout(() => {
-       queryClient.resetQueries()
-    }, 200);
+  //   setTimeout(() => {
+  //      queryClient.resetQueries()
+  //   }, 200);
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  //   window.scrollTo({ top: 0, behavior: 'smooth' });
    
-  }
+  // }
 
   if (appointmentsFetching) {
     return <AppointmentGridSkeleton />
@@ -69,12 +67,13 @@ const AppointmentGridWrapper = () => {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {appointments?.map((apt: any) => <AppointmentCard apt={apt} key={apt.id} />)}
+          {appointments?.map((apt: any) => <div key={apt.id}>{apt.id}</div>)}
+          {/* {appointments?.map((apt: any) => <AppointmentCard apt={apt} key={apt.id} />)} */}
         </div>
       )}
 
       {/* Pagination */}
-      {paginationData  && (
+      {/* {paginationData  && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4  pt-6 mt-4">
           <p className="text-sm text-muted-foreground">
             Showing Page <span className="font-medium text-foreground">{paginationData.page}</span> of{" "}
@@ -82,7 +81,7 @@ const AppointmentGridWrapper = () => {
           </p>
 
           <div className="flex items-center gap-2">
-            {/* Previous */}
+         
             <Button
               variant="outline"
               size="sm"
@@ -93,7 +92,7 @@ const AppointmentGridWrapper = () => {
               <ChevronLeft className="h-4 w-4 mr-1" /> Previous
             </Button>
 
-            {/* Page Numbers */}
+         
             <div className="hidden md:flex gap-1">
               {Array.from({ length: paginationData.totalPage }, (_, i) => i + 1).map(pageNum => (
                 <Button
@@ -108,7 +107,7 @@ const AppointmentGridWrapper = () => {
               ))}
             </div>
 
-            {/* Next */}
+           
             <Button
               variant="outline"
               size="sm"
@@ -120,7 +119,7 @@ const AppointmentGridWrapper = () => {
             </Button>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   )
 }

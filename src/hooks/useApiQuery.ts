@@ -1,6 +1,7 @@
 import { envVeriables } from "@/config/envVariables";
 import { ApiResponse } from "@/features/shared/types";
 import httpClient from "@/lib/axios-client";
+import { serverFetch } from "@/lib/serverFetch";
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -20,19 +21,8 @@ export function useApiQuery<T>(
           return data;
         } else {
           // Server-side fetch with ISR support
-          const res = await fetch(
-            `${envVeriables.NEXT_PUBLIC_API_URL}${endpoint}`,
-            {
-              credentials: "include",
-              next: {
-                revalidate: 60, // ISR: cache for 60s
-              },
-            }
-          );
-
-          if (!res.ok) throw new Error("Fetch failed");
-
-          return res.json();
+               const res = await serverFetch(`/appointments/patient/my-appointments`)
+ return res
         }
       } catch (error: any) {
         // toast.error("Fetch Error");

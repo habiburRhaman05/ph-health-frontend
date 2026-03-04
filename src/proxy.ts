@@ -18,7 +18,7 @@ export async function proxy(request: NextRequest) {
 
   // --- 2. GET USER AUTH STATE ---
   // Replace this with your actual logic (e.g., checking a cookie or JWT)
-  const token = request.cookies.get('accessToken')?.value;
+  const token = request.cookies.get('accessToken')?.value  || request.cookies.get('refreshToken')?.value
 
   const userData = await decodeToken(token!)
  const userRole = userData.user && userData.user.role as UserRole
@@ -32,10 +32,10 @@ export async function proxy(request: NextRequest) {
   // --- 3. PROTECTION LOGIC ---
 
   // Redirect authenticated users away from Sign-in/Sign-up
-  if (isAuthRoute && token) {
-    const dashboardPath = `/${userRole?.toLowerCase()}/dashboard`;
-    return NextResponse.redirect(new URL(dashboardPath, request.url));
-  }
+  // if (isAuthRoute && token) {
+  //   const dashboardPath = `/${userRole?.toLowerCase()}/dashboard`;
+  //   return NextResponse.redirect(new URL(dashboardPath, request.url));
+  // }
 
   // If it's a public route, allow access regardless of auth
   if (isPublicRoute) {
@@ -43,22 +43,22 @@ export async function proxy(request: NextRequest) {
   }
 
   // Protect Dashboard Routes (Role-Based Access Control)
-  if (!token && !isPublicRoute && !isAuthRoute) {
-    return NextResponse.redirect(new URL('/sign-in', request.url));
-  }
+  // if (!token && !isPublicRoute && !isAuthRoute) {
+  //   return NextResponse.redirect(new URL('/sign-in', request.url));
+  // }
 
   // Role Validation (Prevent a PATIENT from visiting /admin/dashboard)
-  if (pathname.startsWith('/admin') && userRole !== UserRole.ADMIN && userRole !== UserRole.SUPER_ADMIN) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));
-  }
+  // if (pathname.startsWith('/admin') && userRole !== UserRole.ADMIN && userRole !== UserRole.SUPER_ADMIN) {
+  //   return NextResponse.redirect(new URL('/unauthorized', request.url));
+  // }
 
-  if (pathname.startsWith('/doctor/dashboard') && userRole !== UserRole.DOCTOR) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));
-  }
+  // if (pathname.startsWith('/doctor/dashboard') && userRole !== UserRole.DOCTOR) {
+  //   return NextResponse.redirect(new URL('/unauthorized', request.url));
+  // }
 
-  if (pathname.startsWith('/patient/dashboard') && userRole !== UserRole.PATIENT) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));
-  }
+  // if (pathname.startsWith('/patient/dashboard') && userRole !== UserRole.PATIENT) {
+  //   return NextResponse.redirect(new URL('/unauthorized', request.url));
+  // }
 
   return NextResponse.next();
 }

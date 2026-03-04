@@ -20,7 +20,7 @@ export function useAppointments(filters: AppointmentFilters) {
   const {data,isLoading,isError} = useApiQuery<any[]>(
     [queryKey],
     `appointments/patient/my-appointments?${queryParams.toString()}`,
-    "axios",
+    "fetch",
     { staleTime: 60 * 1000,enabled:filters.appointmentsList}
   );
 
