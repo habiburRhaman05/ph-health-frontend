@@ -17,7 +17,7 @@ import { useUser } from '@/context/UserContext'
 import { toast } from 'sonner' // Assuming you use sonner or similar for notifications
 import { queryKeys } from '@/lib/react-query-keys'
 import { useApiMutation } from '@/hooks/useApiMutation'
-import { handleBookingLatar } from '@/features/appointments/services/appointment.services'
+import { handleBookingLatar, handleBookingPayNow } from '@/features/appointments/services/appointment.services'
 
 const bookingFormSchema = z.object({
   appointmentType: z.enum(['online']),
@@ -40,7 +40,7 @@ export function BookingModal({ doctor, open, onOpenChange }: BookingModalProps) 
      const bookAppointmentMutation = useApiMutation({
         endpoint:"/appointments",
         method:"POST",
-        
+        customFn:handleBookingPayNow,
         invalidateKeys:[queryKeys.getDocotrIdKeys(doctor.id)]
         
     });
