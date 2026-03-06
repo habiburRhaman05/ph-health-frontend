@@ -142,44 +142,79 @@ export default function DoctorProfilePage() {
                   Available Schedules
                 </h2>
                 
-                {doctor.schedules && doctor.schedules.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {doctor.schedules.map((sc) => (
-                      <div 
-                        key={sc.id} 
-                        className={`flex flex-col p-4 rounded-xl border transition-all ${
-                          sc.isBooked 
-                            ? "bg-muted/50 border-border opacity-60" 
-                            : "bg-background border-primary/20 hover:border-primary hover:shadow-sm"
-                        }`}
-                      >
-                        <div className="flex justify-between items-start mb-3">
-                          <Badge variant={sc.isBooked ? "outline" : "default"} className={sc.isBooked ? "bg-transparent" : "bg-green-500/10 text-green-600 hover:bg-green-500/20 border-none"}>
-                            {sc.isBooked ? "Booked" : "Available"}
-                          </Badge>
-                          <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
-                            ID: {sc.id.split('-')[0]}
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-sm font-medium">
-                            <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                            {format(new Date(sc.startDate), 'PPP')}
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Clock className="h-3.5 w-3.5" />
-                            {sc.startTime} - {sc.endTime}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-10 bg-muted/20 rounded-lg border border-dashed">
-                    <p className="text-muted-foreground text-sm">No schedules available for this doctor.</p>
-                  </div>
-                )}
+            {doctor.schedules && doctor.schedules.length > 0 ? (
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    {doctor.schedules.map((sc) => (
+      <div 
+        key={sc.id} 
+        className={`flex flex-col p-4 rounded-xl border transition-all relative overflow-hidden group ${
+          sc.isBooked 
+            ? "bg-muted/30 border-border/50 opacity-80" 
+            : "bg-card border-primary/20 hover:border-primary hover:ring-1 hover:ring-primary/20 shadow-sm hover:shadow-md"
+        }`}
+      >
+        <div className="flex justify-between items-start mb-4">
+          <Badge 
+            variant="outline" 
+            className={`font-bold px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-wider ${
+              sc.isBooked 
+                ? "bg-destructive/10 text-destructive border-destructive/20" 
+                : "bg-primary/10 text-primary border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+            }`}
+          >
+            {sc.isBooked ? "Reserved" : "Available"}
+          </Badge>
+          
+          <span className="text-[10px] font-mono text-muted-foreground/40">
+            #{sc.id.split('-')[0]}
+          </span>
+        </div>
+        
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+              sc.isBooked ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary"
+            }`}>
+              <Calendar className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-[10px] uppercase text-muted-foreground font-bold tracking-tight">Date</p>
+              <p className={`text-sm font-semibold ${sc.isBooked ? "text-muted-foreground" : "text-foreground"}`}>
+                {format(new Date(sc.startDate), 'PPP')}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+              sc.isBooked ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary"
+            }`}>
+              <Clock className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-[10px] uppercase text-muted-foreground font-bold tracking-tight">Time Slot</p>
+              <p className="text-sm font-medium text-muted-foreground italic">
+                {sc.startTime} — {sc.endTime}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Visual indicator for Available vs Booked */}
+        {!sc.isBooked && (
+          <div className="absolute top-0 right-0 p-2">
+            <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+) : (
+  <div className="flex flex-col items-center justify-center py-12 rounded-xl border border-dashed border-border bg-muted/10">
+    <Calendar className="h-8 w-8 text-muted-foreground/30 mb-2" />
+    <p className="text-muted-foreground text-sm font-medium">No available slots found.</p>
+  </div>
+)}
               </div>
 
               {/* Specialties */}
