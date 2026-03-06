@@ -6,12 +6,6 @@ tasks:
 .fix navBar responsive issuse -done
 
 date - 26-02-26
-.complete appointments page full complete like (add dynamic url query filter,re-factore-code-base) -- done
-. try to improve more data cache and fetching logic
-.appointments details page full implement with dynamic data fetch
-.both page must be responseive and  // done
-.re-facotr the appointments details page code and rgba(208, 16, 16, 1) -done
-.cancel appointment --done 
-.pay now (pay latar ) add // done
-.add site meta data and assest
-.appointment details status dynamic colors -- done 
+. re-factor  all post action with server action with 401 must be handle
+.fix proxy.ts error
+
