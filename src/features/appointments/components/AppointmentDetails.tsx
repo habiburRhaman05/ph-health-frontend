@@ -10,6 +10,7 @@ import AppointmentSidebar from "./AppointmentSidebar";
 import AppointmentDeatilsHeader from "./AppointmentDeatilsHeader";
 import { AppointmentLoadingSkeleton, ErrorState } from "./ApppointmentDetailsSkelection";
 import CancellationModal from "./AppointmentCancellationModal";
+import { IAppointment } from "@/interfaces/appointment";
 
 const AppointmentDetails = ({ id }: { id: string }) => {
   const { data: appointmentData, isLoading, isError } = useApiQuery<any>(
@@ -20,7 +21,8 @@ const AppointmentDetails = ({ id }: { id: string }) => {
   );
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-  const appointment = appointmentData?.data;
+  const appointment:IAppointment = appointmentData?.data[0]
+console.log(appointment);
 
   if (isLoading) return <AppointmentLoadingSkeleton />;
   if (isError || !appointment) return <ErrorState />;
@@ -32,7 +34,7 @@ const AppointmentDetails = ({ id }: { id: string }) => {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-6xl mx-auto space-y-6"
       >
-        {appointment.payment.status !== "COMPLETE" && <p className="text-center font-bold text-red-700 text-lg ">Please Pay-Now First</p>}
+        {appointment.payment?.status !== "COMPLETE" && <p className="text-center font-bold text-red-700 text-lg ">Please Pay-Now First</p>}
         <AppointmentDeatilsHeader appointment={appointment} />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

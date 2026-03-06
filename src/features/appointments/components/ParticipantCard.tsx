@@ -39,7 +39,7 @@ const ParticipantCard = ({ appointment }: { appointment: any }) => {
           <InfoItem label="Experience" value={`${appointment.doctor.experience} Years`} />
           <InfoItem label="Qualification" value={appointment.doctor.qualification} />
           <InfoItem label="Reg. No" value={appointment.doctor.registrationNumber} />
-          <InfoItem label="Specialty" value={appointment.doctor.specialtys[0]?.specialty.title || "General"} />
+          <InfoItem label="Specialty" value={appointment.doctor.designation || "General"} />
         </div>
       </CardContent>
     </Card>

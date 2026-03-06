@@ -36,7 +36,6 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
             cookie: cookieStore.toString()
         },
         credentials: "include",
-        cache: "no-store",
     })
 
 

@@ -21,9 +21,9 @@ export const handleBookingLatar = async (payload:any)=>{
   return response
    
 }
-export const handleBookingPayLatar = async (appointmentId:string)=>{
+export const handleBookingPayLatar = async (payload:{appointmentId:string})=>{
 
-    const response = await serverApi(`/appointments/pay-later/${appointmentId}`,{
+    const response = await serverApi(`/appointments/pay-later/${payload.appointmentId}`,{
         method:"POST"
     });
    console.log("handleBookingPayLatar-response",response);

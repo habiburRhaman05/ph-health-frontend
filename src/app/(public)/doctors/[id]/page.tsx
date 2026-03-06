@@ -29,8 +29,8 @@ export default function DoctorProfilePage() {
 
   const { data: response, isLoading: doctorLoading } = useApiQuery<{
     data: IDoctor
-  }>([queryKeys.getDocotrIdKeys(doctorId)], `/doctors/${doctorId}`, "axios", {
-    staleTime: 1000 * 60 * 1,
+  }>([queryKeys.getDocotrIdKeys("sddoctorId")], `/doctors/${doctorId}`, "axios", {
+    staleTime: 0,
     refetchOnWindowFocus: true,
   })
 
