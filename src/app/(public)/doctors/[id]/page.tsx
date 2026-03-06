@@ -34,7 +34,7 @@ export default function DoctorProfilePage() {
     refetchOnWindowFocus: true,
   })
 
-  const doctor:any  = response?.data || null
+  const doctor:IDoctor | any  = response?.data || null
 
   if (doctorLoading) {
     return (
