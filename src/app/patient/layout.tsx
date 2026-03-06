@@ -1,7 +1,8 @@
 import Header from '@/components/Header';
 import { AppSidebar } from '@/components/Sidebar';
-import { getProfile } from '@/features/auth/services/auth.services';
+import { getMe, getProfile } from '@/features/auth/services/auth.services';
 import { UserRole } from '@/interfaces/enum';
+import { serverFetch } from '@/lib/serverFetch';
 import { redirect } from 'next/navigation';
 import React from 'react';
 
@@ -10,20 +11,14 @@ export default async function ProtectedLayout({
 }: {
   children: React.ReactNode
 }) {
-  // const userData = await getProfile();
 
-  // if (!userData?.user.data) {
-  //   redirect("/sign-in")
-  // }
-  // if (userData?.user?.data?.role !== UserRole.PATIENT) {
-  //   redirect(`/`)
-  // }
  
   return (
       <main className="min-h-screen bg-background w-full">
       <Header />
       <div className="flex">
-        {/* <AppSidebar userRole={userData.user.data.role} userName={userData.user.data.name} /> */}
+     
+        <AppSidebar  />
         <div className="flex-1 min-h-[calc(100vh-64px)] w-full">
           <div className=" w-full">
             {children}

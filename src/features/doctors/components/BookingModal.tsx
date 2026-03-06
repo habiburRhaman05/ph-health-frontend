@@ -14,10 +14,10 @@ import { z } from 'zod'
 import { formatCurrency } from '@/features/shared/utils'
 import { IDoctor } from '@/interfaces/doctor'
 import { useUser } from '@/context/UserContext'
-import useAppointment from '@/features/appointments/hook/useAppointment'
 import { toast } from 'sonner' // Assuming you use sonner or similar for notifications
 import { queryKeys } from '@/lib/react-query-keys'
 import { useApiMutation } from '@/hooks/useApiMutation'
+import { handleBookingLatar } from '@/features/appointments/services/appointment.services'
 
 const bookingFormSchema = z.object({
   appointmentType: z.enum(['online']),
@@ -40,14 +40,34 @@ export function BookingModal({ doctor, open, onOpenChange }: BookingModalProps) 
      const bookAppointmentMutation = useApiMutation({
         endpoint:"/appointments",
         method:"POST",
+        
         invalidateKeys:[queryKeys.getDocotrIdKeys(doctor.id)]
+        
     });
     const bookAppointmentWithPayLatarMutation = useApiMutation({
         endpoint:"/appointments/book-with-pay-later",
         method:"POST",
+        customFn:handleBookingLatar,
         successMessage:"Appointment Reserved! Please pay within 24 hours.",
         invalidateKeys:[queryKeys.getDocotrIdKeys(doctor.id)]
 
+    },{
+      onSuccess:(data)=>{
+        console.log(data);
+        
+         if(data.success){
+          toast.success(data.message)
+         }else{
+          toast.error(data.message)
+
+         }
+      },
+      onError:(err)=>{
+            console.log(err);
+            
+          toast.error(err.message)
+         
+      }
     });
 
 
@@ -102,7 +122,8 @@ export function BookingModal({ doctor, open, onOpenChange }: BookingModalProps) 
                }
           
         } else {
-          await bookAppointmentWithPayLatarMutation.mutateAsync(payload)
+           await bookAppointmentWithPayLatarMutation.mutateAsync(payload)
+        
         }
           onOpenChange(false)
           reset()

@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { setTokenInCookies } from "./token";
 
 export const setCookie = async (
     name : string,
@@ -26,4 +27,17 @@ export const getCookie = async (name : string) => {
 export const deleteCookie = async (name : string) => {
     const cookieStore = await cookies();
     cookieStore.delete(name);
+}
+
+export const setAuthCookie = async (accessToken:string,sessionToken:string,refreshToken:string)=>{
+    "use server"
+      try {
+           await setTokenInCookies("accessToken", accessToken, 10 * 60);
+                await setTokenInCookies("better-auth.session_token", sessionToken, 10 * 60);
+                await setTokenInCookies("refreshToken", refreshToken, 30 * 60);
+                return true
+      } catch (error) {
+                return false
+        
+      }
 }

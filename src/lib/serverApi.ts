@@ -3,14 +3,20 @@
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { isTokenExpiring } from "./jwt"
+import { StringDecoder } from "string_decoder"
+import { setTokenInCookies } from "./token"
 
 let refreshPromise: Promise<string | null> | null = null
 
-async function refreshAccessToken(): Promise<string | null> {
+async function refreshAccessToken(cookies:string): Promise<string | null> {
   if (!refreshPromise) {
     refreshPromise = (async () => {
-      const res = await fetch(`${process.env.API_URL}/auth/refresh`, {
+     try {
+       const res = await fetch(`${process.env.API_URL}/auth/refresh-token`, {
         method: "POST",
+        headers:{
+          cookie:cookies,
+        },
         credentials: "include",
         cache: "no-store",
       })
@@ -20,7 +26,18 @@ async function refreshAccessToken(): Promise<string | null> {
       }
       const json = await res.json().catch(() => null)
       refreshPromise = null
-      return json?.accessToken ?? null
+
+
+      const {accessToken,refreshToken,sessionToken} = json?.data;
+
+      await setTokenInCookies("accessToken",accessToken,20*60)
+      await setTokenInCookies("refreshToken",refreshToken,20*60)
+      await setTokenInCookies("better-auth.session_token",sessionToken,20*60)
+
+      return json?.data.accessToken ?? null
+     } catch (error) {
+      console.log("refresh token error",error);
+     }
     })()
   }
   return refreshPromise
@@ -32,36 +49,64 @@ async function refreshAccessToken(): Promise<string | null> {
  */
 export async function serverApi(path: string, options: RequestInit = {}) {
   const cookieStore = await cookies()
-  let accessToken = cookieStore.get("accessToken")?.value ?? null
 
-  if (isTokenExpiring(accessToken, 30)) {
-    const newAccess = await refreshAccessToken()
-    if (!newAccess) redirect("/login")
-    accessToken = newAccess
-  }
+const headers = {
+    "Content-Type": "application/json",
+    ...options.headers,
+    cookie: cookieStore.toString(),
+  };
 
-  let res = await fetch(`${process.env.API_URL}${path}`, {
+  // 2. Stringify body if it exists and isn't already a string
+  const body = options.body && typeof options.body === 'object' 
+    ? JSON.stringify(options.body) 
+    : options.body;
+
+  const fetchOptions = {
     ...options,
-    headers: {
-      ...((options && options.headers) || {}),
-      Authorization: accessToken ? `Bearer ${accessToken}` : "",
-    },
-    credentials: "include",
-  })
+    headers,
+    body,
+    credentials: "include" as const,
+  };
+try {
+    let res = await fetch(`${process.env.API_URL}${path}`,fetchOptions)
+
+
 
   if (res.status === 401) {
-    const newAccess = await refreshAccessToken()
-    if (!newAccess) redirect("/login")
+    console.log("receive 401 error");
+    
+    const newAccess = await refreshAccessToken(cookieStore.toString())
+console.log(cookieStore.toString());
+
+    if (!newAccess) redirect("/sign-in")
 
     res = await fetch(`${process.env.API_URL}${path}`, {
       ...options,
       headers: {
         ...((options && options.headers) || {}),
-        Authorization: `Bearer ${newAccess}` || "",
+      cookie:cookieStore.toString()
       },
       credentials: "include",
     })
+    console.log(res);
+    
+    if(!res.ok){
+      console.log("creating error");
+      
+    }
+    const data = await res.json()
+
+    return JSON.parse(JSON.stringify(data));
+
   }
 
-  return res
+    const data = await res.json()
+
+    return JSON.parse(JSON.stringify(data));
+
+
+} catch (error) {
+  console.log("servre api error",error);
+  
+}
 }

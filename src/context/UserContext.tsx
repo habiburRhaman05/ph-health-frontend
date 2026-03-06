@@ -1,40 +1,46 @@
 "use client";
 
-import { IUser } from '@/interfaces/user';
-import React, { createContext, useContext } from 'react';
-
-type UserType = IUser | null;
+import { createContext, useContext, useEffect, useState } from "react";
+import { getMe } from "@/features/auth/services/auth.services";
+import { IUser } from "@/interfaces/user";
 
 interface IUserContext {
-  user: UserType;
-  isLoading: boolean;
+  user:IUser | null,
+  isLoading:boolean
 }
-
-
 export const UserContext = createContext<IUserContext | undefined>(undefined);
 
-interface IProps {
-  children: React.ReactNode;
-  userData: IUserContext; 
+export default function UserContextWrapper({ children }: { children: React.ReactNode }) {
+  const [userPayload, setUserPayload] = useState<{ user: any; isLoading: boolean }>({
+    user: null,
+    isLoading: true,
+  });
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await getMe();
+        setUserPayload({ user: res?.data || null, isLoading: false });
+      } catch (err) {
+        console.error(err);
+        setUserPayload({ user: null, isLoading: false });
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  // Loading overlay
+  if (userPayload.isLoading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white"></div>
+        hello Loading...
+      </div>
+    );
+  }
+
+  return <UserContext.Provider value={userPayload}>{children}</UserContext.Provider>;
 }
 
-const UserContextProvider = ({ children, userData }: IProps) => {
-console.log("user",userData.user?.email);
-
-  return (
-    <UserContext.Provider value={userData}>
-      {children}
-    </UserContext.Provider>
-  );
-};
-
-// add custom hook
-export const useUser = () => {
-  const context = useContext(UserContext);
-  if (context === undefined) {
-    throw new Error('useUser must be used within a UserContextProvider');
-  }
-  return context;
-};
-
-export default UserContextProvider;
+export const useUser = () => { const context = useContext(UserContext); if (context === undefined) { throw new Error('useUser must be used within a UserContextProvider'); } return context; };

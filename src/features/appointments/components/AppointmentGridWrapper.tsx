@@ -30,6 +30,7 @@ const AppointmentGridWrapper = () => {
     status,
     q
   });
+console.log(appointments);
 
   
   // Pagination handler
@@ -67,8 +68,8 @@ const AppointmentGridWrapper = () => {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {appointments?.map((apt: any) => <div key={apt.id}>{apt.id}</div>)}
-          {/* {appointments?.map((apt: any) => <AppointmentCard apt={apt} key={apt.id} />)} */}
+          {/* {appointments?.map((apt: any) => <div key={apt.id}>{apt.id}</div>)} */}
+          {appointments?.map((apt: any) => <AppointmentCard apt={apt} key={apt.id} />)}
         </div>
       )}
 

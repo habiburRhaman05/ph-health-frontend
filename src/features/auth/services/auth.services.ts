@@ -6,6 +6,8 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { signInPayloadType } from "../types";
 import { deleteCookie } from "@/lib/cookie";
+import { serverFetch } from "@/lib/serverFetch";
+import { NextRequest } from "next/server";
 
 export const getProfile = async (): Promise<{ user: { data: any } } | null> => {
   const cookieStore = await cookies();
@@ -26,6 +28,15 @@ export const getProfile = async (): Promise<{ user: { data: any } } | null> => {
   return { user }
 };
 
+export const getMe = async ()=>{
+try {
+    let data = await serverFetch("/auth/me");
+  return data
+} catch (error) {
+  console.log(error);
+  
+}
+}
 
 export const handleLogin = async (loginPayload: signInPayloadType) => {
   try {
@@ -83,3 +94,40 @@ export const handleLogout = async () => {
 
 
 
+let refreshPromise: Promise<any> | null = null;
+
+
+export async function refreshTokens(refreshToken: string, apiUrl: string) {
+  if (!refreshPromise) {
+    refreshPromise = fetch(`${apiUrl}/auth/refresh-token`, {
+      method: 'POST',
+      headers: { Cookie: `refreshToken=${refreshToken}` },
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error('Refresh failed');
+        return res.json();
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+}
+
+
+export async function  isTokenExpiringSoon(token: string) {
+  try {
+    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+    const exp = payload.exp * 1000;
+    return exp - Date.now() < 5 * 60 * 1000; // 5 minutes
+  } catch {
+    return true;
+  }
+}
+
+
+export async function getTokens(req: NextRequest) {
+  const accessToken = req.cookies.get('accessToken')?.value;
+  const refreshToken = req.cookies.get('refreshToken')?.value;
+  return { accessToken, refreshToken };
+}

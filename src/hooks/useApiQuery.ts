@@ -14,14 +14,17 @@ export function useApiQuery<T>(
   return useQuery<ApiResponse<T>, Error>({
     queryKey,
     queryFn: async () => {
-      try {
+    try {
         if (fetchMethod === "axios") {
           // Client-side Axios
           const { data } = await httpClient.get(endpoint);
           return data;
         } else {
           // Server-side fetch with ISR support
-               const res = await serverFetch(`/appointments/patient/my-appointments`)
+               const res = await serverFetch(`/appointments/patient/my-appointments`,{
+                cache:"default",
+                credentials:"include"
+               })
  return res
         }
       } catch (error: any) {
