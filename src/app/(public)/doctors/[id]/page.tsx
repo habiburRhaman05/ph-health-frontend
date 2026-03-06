@@ -17,6 +17,9 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
 import { format } from 'date-fns'
+import { ISchedule } from '@/interfaces/schedule'
+import { ISpecialty } from '@/interfaces/speciality'
+import { IReview } from '@/interfaces/review'
 
 export default function DoctorProfilePage() {
   const params = useParams()
@@ -31,7 +34,7 @@ export default function DoctorProfilePage() {
     refetchOnWindowFocus: true,
   })
 
-  const doctor = response?.data
+  const doctor:any  = response?.data || null
 
   if (doctorLoading) {
     return (
@@ -144,7 +147,7 @@ export default function DoctorProfilePage() {
                 
             {doctor.schedules && doctor.schedules.length > 0 ? (
   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    {doctor.schedules.map((sc) => (
+    {doctor.schedules.map((sc:ISchedule) => (
       <div 
         key={sc.id} 
         className={`flex flex-col p-4 rounded-xl border transition-all relative overflow-hidden group ${
@@ -224,7 +227,7 @@ export default function DoctorProfilePage() {
                   Specialties
                 </h2>
                 <div className="flex flex-wrap gap-2">
-                  {doctor.doctorSpecialties?.map((spec) => (
+                  {doctor.doctorSpecialties?.map((spec:ISpecialty) => (
                     <Badge key={spec.id} variant="secondary" className="px-3 py-1">
                       {spec.title}
                     </Badge>
@@ -237,7 +240,7 @@ export default function DoctorProfilePage() {
                 <h2 className="text-xl font-semibold mb-6">Patient Reviews ({doctor.reviews?.length || 0})</h2>
                 {doctor.reviews && doctor.reviews.length > 0 ? (
                   <div className="space-y-6">
-                    {doctor.reviews.map((review) => (
+                    {doctor.reviews.map((review:IReview) => (
                       <div key={review.id} className="border-b last:border-0 pb-4 last:pb-0">
                         <div className="flex justify-between mb-2">
                           <p className="font-medium">{review.patient?.name}</p>
@@ -264,7 +267,7 @@ export default function DoctorProfilePage() {
                   Qualifications
                 </h2>
                 <div className="flex flex-wrap gap-2">
-                  {doctor.qualification.split(',').map((qual, idx) => (
+                  {doctor.qualification.split(',').map((qual:string, idx:number) => (
                     <Badge key={idx} variant="outline" className="border-primary/30">
                       {qual.trim()}
                     </Badge>
