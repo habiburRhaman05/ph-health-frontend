@@ -7,8 +7,8 @@ tasks:
 
 date - 26-02-26
 . re-factor  all post action with server action with 401 must be handle
-  .pay now 
-  .fix appointment details page rendering error 
+  .pay now -- done
+  .fix appointment details page rendering error  -- done
   .add cancel appointment
 .fix proxy.ts error
 

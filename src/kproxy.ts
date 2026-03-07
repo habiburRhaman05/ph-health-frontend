@@ -5,7 +5,7 @@ import { decodeToken } from './lib/token';
 import { refreshTokens, isTokenExpiringSoon, getTokens } from './features/auth/services/auth.services';
 
 const AUTH_ROUTES = ['/sign-in', '/sign-up'];
-const PUBLIC_ROUTES = ['/', '/about-us'];
+const PUBLIC_ROUTES = ['/', '/about-us',"/ai"];
 const PUBLIC_DYNAMIC_PREFIXES = ['/doctors'];
 
 export async function proxy(request: NextRequest) {
