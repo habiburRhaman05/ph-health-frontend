@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
 import { extractText } from "unpdf";
 
-const groq = new Groq({ apiKey: "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" });
+const groq = new Groq({ apiKey: "" });
 
 export async function POST(request: Request) {
   try {
