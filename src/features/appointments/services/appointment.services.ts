@@ -1,33 +1,39 @@
 "use server"
 import { serverApi } from "@/lib/serverApi"
 
-export const handleBookingPayNow = async (payload:any)=>{
-    console.log(payload);
+// export const handleBookingPayNow = async (payload:any,config:{url:string,method:string})=>{
+//     console.log(payload);
     
-    const response = await serverApi("/appointments",{
-        body:JSON.stringify(payload),
-        method:"POST"
-    });
-  return response
-   
-}
-export const handleBookingLatar = async (payload:any)=>{
-    console.log(payload);
+//     const response = await serverApi(config.url,{
+//         body:JSON.stringify(payload),
+//         method:config.method
+//     });
+//   return response
+// }
+// export const handleBookingLatar = async (payload:any,config:{url:string,method:string})=>{
+//     console.log(payload);
     
-    const response = await serverApi("/appointments/book-with-pay-later",{
-        body:JSON.stringify(payload),
-        method:"POST"
-    });
-  return response
+//     const response = await serverApi(config.url,{
+//         body:JSON.stringify(payload),
+//         method:config.method
+//     });
+//   return response
    
-}
-export const handleBookingPayLatar = async (payload:{appointmentId:string})=>{
+// }
+// export const handleBookingPayLatar = async (payload:{appointmentId:string},config:{url:string,method:string})=>{
+//     const response = await serverApi(config.url,{
+//         body:JSON.stringify(payload),
+//         method:config.method
+//     });
+//   return response
+   
+// }
+// export const handleBookingCancelPayLatar = async (payload:any,config:{url:string,method:string})=>{
 
-    const response = await serverApi(`/appointments/pay-later/${payload.appointmentId}`,{
-        method:"POST"
-    });
-   console.log("handleBookingPayLatar-response",response);
+//     const response = await serverApi(config.url,{
+//         body:JSON.stringify(payload),
+//         method:config.method
+//     });
+//   return response
    
-  return response
-   
-}
+// }

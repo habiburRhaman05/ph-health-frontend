@@ -2,7 +2,9 @@
 
 import httpClient from "@/lib/axios-client";
 import { queryClient } from "@/lib/react-query";
+import { serverApi } from "@/lib/serverApi";
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
+import { ErrorInfo } from "react";
 import { toast } from "sonner";
 
 type MutationMethod = "POST" | "PUT" | "PATCH" | "DELETE";
@@ -15,9 +17,10 @@ type VariableWithMeta<T> = T & {
 };
 
 interface MutationConfig {
-  method: MutationMethod;
+  actionName: string;
   endpoint: string;
-  customFn?: (payload: any) => Promise<any>;
+  method: MutationMethod;
+  actionType:"CLIENT_SIDE" | "SERVER_SIDE"
   invalidateKeys?: string[];
   successMessage?: string;
   errorMessage?: string;
@@ -27,18 +30,21 @@ export function useApiMutation<TData = any, TVariables = any, TContext = unknown
   config: MutationConfig,
   hookOptions?: UseMutationOptions<TData, Error, VariableWithMeta<TVariables>, TContext>
 ) {
-  const { method, endpoint, customFn, invalidateKeys, successMessage: configSuccess, errorMessage: configError } = config;
+  const { method,actionName, endpoint, actionType, invalidateKeys, successMessage: configSuccess, errorMessage: configError } = config;
 
   return useMutation<TData, Error, VariableWithMeta<TVariables>, TContext>({
     mutationFn: async (variables) => {
       const { meta, ...payload } = (variables || {}) as any;
-      if (customFn) return await customFn(payload);
-      
-      const response = await httpClient({
+      const actionsInfo = {
+        
         url: endpoint,
         method,
-        data: payload,
-      });
+        body: payload,
+        actionName:actionName
+      }
+      if (actionType === "SERVER_SIDE")  return await handleServerAction(actionsInfo) 
+      
+      const response = await httpClient(actionsInfo);
       return response.data;
     },
 
@@ -87,4 +93,27 @@ export function useApiMutation<TData = any, TVariables = any, TContext = unknown
     // Spread other options like onMutate or retry
     ...hookOptions,
   });
+}
+
+
+export const handleServerAction = async (actionsInfo:{
+    url:string,
+  method:"POST" | "PUT" | "PATCH" | "DELETE",
+  body:any,
+  actionName:string
+})=>{
+  try {
+        const response = await serverApi(actionsInfo.url,{
+        body:JSON.stringify(actionsInfo.body),
+        method:actionsInfo.method
+    });
+  return response
+  } catch (error:any) {
+    console.log(error);
+    
+    return {
+      success:false,
+      message:error.message || `Something Wrong Doing ${actionsInfo.actionName}! Check Logs`
+    }
+  }
 }

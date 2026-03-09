@@ -8,7 +8,7 @@ import { setTokenInCookies } from "./token"
 
 let refreshPromise: Promise<string | null> | null = null
 
-async function refreshAccessToken(cookies:string): Promise<string | null> {
+export async function refreshAccessToken(cookies:string): Promise<string | null> {
   if (!refreshPromise) {
     refreshPromise = (async () => {
      try {

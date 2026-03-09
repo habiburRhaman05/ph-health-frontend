@@ -12,7 +12,9 @@ const CancellationModal = ({ isOpen, onClose, appointmentId,appointmentStatus }:
 
   const cancelMutation = useApiMutation({
     method:"PATCH",
-    endpoint:`/appointments/${appointmentId}/cancel`
+    endpoint:`/appointments/${appointmentId}/cancel`,
+      actionName:"cancel-booking",
+      actionType:"SERVER_SIDE"
   })
 
   const handleConfirm = async() => {

@@ -22,8 +22,6 @@ import {
     XCircle
 } from "lucide-react"
 import Link from "next/link"
-import { handleBookingPayLatar } from "../services/appointment.services"
-
 
 // 1. Configuration for Status Styles
 const statusConfig: Record<string, { label: string; icon: React.ElementType; className: string }> = {
@@ -51,8 +49,9 @@ const AppointmentCard = ({apt}:{apt:any}) => {
               const payLaterMutation = useApiMutation({
     method:"POST",
     endpoint:`/appointments/pay-later/${apt.id}`,
-    customFn:handleBookingPayLatar,
-  });
+   actionName:"handle-pay-latar",
+   actionType:"SERVER_SIDE",
+  },);
 
   const payLatarHandler = async()=>{
     const result = await payLaterMutation.mutateAsync({appointmentId:apt.id});
