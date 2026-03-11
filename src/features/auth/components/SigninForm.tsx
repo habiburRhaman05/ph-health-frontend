@@ -72,7 +72,7 @@ console.log(result);
                 let url = "/dashboard";
                 if (role === "PATIENT") url = "/patient/dashboard";
                 else if (role === "DOCTOR") url = "/doctor/dashboard";
-                else if (role === "ADMIN") url = "/admin/dashboard";
+                else if (role === "ADMIN" || role === "SUPER_ADMIN") url = "/admin";
 
                 // We keep showLoading true while Next.js finishes the push
                 router.push(url);

@@ -30,9 +30,9 @@ export async function refreshAccessToken(cookies:string): Promise<string | null>
 
       const {accessToken,refreshToken,sessionToken} = json?.data;
 
-      await setTokenInCookies("accessToken",accessToken,20*60)
-      await setTokenInCookies("refreshToken",refreshToken,20*60)
-      await setTokenInCookies("better-auth.session_token",sessionToken,20*60)
+      await setTokenInCookies("accessToken",accessToken,10*60)
+      await setTokenInCookies("refreshToken",refreshToken,30*60)
+      await setTokenInCookies("better-auth.session_token",sessionToken,10*60)
 
       return json?.data.accessToken ?? null
      } catch (error) {

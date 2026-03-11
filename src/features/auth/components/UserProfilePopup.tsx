@@ -5,6 +5,7 @@ import Link from 'next/link'
 import React from 'react'
 import LogoutButton from './LogoutButton'
 import { IUser } from '@/interfaces/user'
+import { UserRole } from '@/interfaces/enum'
 
 const UserProfile = ({user}:{user:IUser}) => {
   return (
@@ -28,7 +29,7 @@ const UserProfile = ({user}:{user:IUser}) => {
                     </div>
                   </div>
                   <div className="grid gap-1">
-                    <Link href={`/${user.role?.toLowerCase()}/dashboard`}>
+                    <Link href={`/${user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN ? "admin" : user.role.toLowerCase() }/dashboard`}>
                       <div className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                         <LayoutDashboard className="h-4 w-4" /> Dashboard
                       </div>

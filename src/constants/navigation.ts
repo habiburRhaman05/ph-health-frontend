@@ -22,6 +22,10 @@ export const SIDEBAR_LINKS = {
     { title: "System Logs", href: "/admin/dashboard/logs", icon: ShieldAlert },
     { title: "Payments", href: "/admin/dashboard/payments", icon: CreditCard },
   ],
+  SUPER_ADMIN: [
+    { title: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    { title: "Manages Doctors", href: "/admin/dashboard/doctors", icon: LayoutDashboard },
+  ],
   DOCTOR: [
     { title: "Dashboard", href: "/doctor/dashboard", icon: LayoutDashboard },
     { title: "My Schedule", href: "/doctor/dashboard/schedule", icon: CalendarDays },

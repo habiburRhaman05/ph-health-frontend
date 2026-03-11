@@ -49,7 +49,7 @@ export function AppSidebar() {
                 Navigation
               </SidebarGroupLabel>
               <SidebarMenu className="px-3 gap-1">
-                {links.map((link) => {
+                {links.map((link:any) => {
                   const isActive = pathname === link.href
                   return (
                     <SidebarMenuItem key={link.href}>

@@ -71,6 +71,8 @@ export async function proxy(request: NextRequest) {
 
   // --- 5. DECODE USER & ROLE ---
   const userData = accessToken ? await decodeToken(accessToken) : null;
+ 
+  
   const userRole = userData?.user?.role as UserRole | undefined;
 
   // --- 6. ROLE BASED ACCESS ---
@@ -80,8 +82,11 @@ export async function proxy(request: NextRequest) {
   if (pathname.startsWith('/doctor/dashboard') && userRole !== UserRole.DOCTOR)
     return NextResponse.redirect(new URL('/unauthorized', request.url));
 
-  if (pathname.startsWith('/patient/dashboard') && userRole !== UserRole.PATIENT)
+  if (pathname.startsWith('/patient/dashboard') && userRole !== UserRole.PATIENT){
+      console.log("entry",userRole);
+    
     return NextResponse.redirect(new URL('/unauthorized', request.url));
+  }
   return NextResponse.next();
 }
 
