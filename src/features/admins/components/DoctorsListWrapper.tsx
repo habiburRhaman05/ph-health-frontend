@@ -12,7 +12,7 @@ const DoctorsListWrapper = () => {
 
   const {data,isLoading,isError} = useApiQuery<any[]>(
     [queryKeys.FETCH_DOCTOR_LIST_BY_ADMIN,params.toString()],
-    `/doctors`,
+    `/doctors?page=${params.get("page")}`,
     "axios",
     { staleTime: 60 * 1000}
   );
