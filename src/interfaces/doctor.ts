@@ -29,9 +29,7 @@ export interface IDoctor {
    reviews?: IReview[];
    schedules?: ISchedule[];
  doctorSpecialties:ISpecialty[]
-  user:{
-    emailVerified:boolean
-  }
+  user:IUser
 }
 
 

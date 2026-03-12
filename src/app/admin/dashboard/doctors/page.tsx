@@ -1,20 +1,25 @@
-import DoctorsListWrapper from '@/features/admins/components/DoctorsListWrapper';
-import { queryKeys } from '@/lib/react-query-keys';
-import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query'
-import React from 'react'
+import DoctorsListWrapper from "@/components/modules/admins/DoctorsListWrapper"
+import { getDoctors } from "@/services/admin.services"
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query"
 
-const page = async() => {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: { page?: string }
+}) {
 
-  const client = new QueryClient();
+  const page = Number( searchParams?.page ?? 1)
 
-  await client.prefetchQuery({
-    queryKey:[queryKeys.FETCH_DOCTOR_LIST_BY_ADMIN]})
+  const queryClient = new QueryClient()
+
+  await queryClient.prefetchQuery({
+    queryKey: ["doctors", page],
+    queryFn: () => getDoctors(page),
+  })
 
   return (
-      <HydrationBoundary state={dehydrate(client)}>
-        <DoctorsListWrapper/>
-      </HydrationBoundary>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <DoctorsListWrapper />
+    </HydrationBoundary>
   )
 }
-
-export default page

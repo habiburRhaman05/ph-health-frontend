@@ -1,23 +1,19 @@
 "use client";
 
-import React, { useMemo, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Mail, Phone, Trash2, MoreVertical } from "lucide-react";
+import { Mail, MoreVertical, Trash2, Search } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,58 +22,46 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { IDoctor } from "@/interfaces/doctor";
+import { IPagination } from "@/interfaces/response";
+import { UpdateDoctorModal } from "./UpdateDoctorModal";
+import { DeleteDoctorModal } from "./DeleteDoctorModal";
 
-// ---------------- Types ----------------
-type Specialty = { specialty: { title: string } };
-type Doctor = {
-  id: string;
-  name: string;
-  email: string;
-  profilePhoto: string | null;
-  experience: number;
-  appointmentFee: number;
-  designation: string;
-  specialtys: Specialty[];
-  user: { status: string };
-};
-interface Meta {
-  page: number;
-  limit: number;
-  total: number;
-  totalPage: number;
-}
-
-// ---------------- Component ----------------
 export default function ManageDoctorsTable({
   doctors,
   isLoading,
-  pagination,
-  onPageChange, // callback to fetch data for a specific page
+  pagination = { page: 1, limit: 0, total: 0, totalPages: 1 },
 }: {
-  doctors: Doctor[];
+  doctors: IDoctor[];
   isLoading: boolean;
-  pagination: Meta;
-  onPageChange: (page: number) => void;
+  pagination: IPagination | any;
 }) {
-
-  if(!pagination) return <h1>loadingn</h1>
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  // ---------------- Current Page ----------------
   const currentPageQuery = Number(searchParams.get("page")) || pagination?.page;
+
+  const [editModal, setEditModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState<IDoctor | null>(null);
   const [pageIndex, setPageIndex] = useState(currentPageQuery - 1);
+  const [search, setSearch] = useState(""); // search input
+  const [sorting, setSorting] = useState<{ id: string; desc: boolean }[]>([]);
 
   useEffect(() => {
     setPageIndex(currentPageQuery - 1);
   }, [currentPageQuery]);
 
-  // ---------------- Columns ----------------
-  const columns = useMemo<ColumnDef<Doctor>[]>(
+  // -------------------- Columns --------------------
+  const columns = useMemo<ColumnDef<IDoctor>[]>(
     () => [
       {
         accessorKey: "name",
@@ -100,21 +84,9 @@ export default function ManageDoctorsTable({
         ),
       },
       {
-        accessorKey: "specialtys",
-        header: "Specialties",
-        cell: ({ row }) => (
-          <div className="flex flex-wrap gap-1 max-w-[200px]">
-            {row.original.specialtys.map((s, idx) => (
-              <Badge
-                key={idx}
-                variant="outline"
-                className="text-[10px] font-normal"
-              >
-                {s.specialty.title}
-              </Badge>
-            ))}
-          </div>
-        ),
+        accessorKey: "designation",
+        header: "Designation",
+        cell: ({ row }) => <div>{row.original.designation}</div>,
       },
       {
         header: "Contact",
@@ -123,31 +95,30 @@ export default function ManageDoctorsTable({
             <div className="flex items-center gap-1.5">
               <Mail className="h-3 w-3" /> {row.original.email}
             </div>
-            <div className="flex items-center gap-1.5">
-              <Phone className="h-3 w-3" /> {row.original.experience} yrs Exp
-            </div>
           </div>
         ),
       },
       {
         accessorKey: "appointmentFee",
-        header: "Fee",
-        cell: ({ row }) => <span className="font-medium">${row.original.appointmentFee}</span>,
+        header: () => <span>Fee 💲</span>,
+        cell: ({ row }) => <span>${row.original.appointmentFee}</span>,
+        enableSorting: true,
       },
       {
         accessorKey: "user.status",
-        header: "Status",
+        header: () => <span>Status</span>,
         cell: ({ row }) => (
           <Badge
             className={
               row.original.user.status === "ACTIVE"
                 ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10"
-                : ""
+                : "bg-gray-200 text-gray-700"
             }
           >
             {row.original.user.status}
           </Badge>
         ),
+        enableSorting: true,
       },
       {
         id: "actions",
@@ -161,9 +132,21 @@ export default function ManageDoctorsTable({
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(row.original.id)}
+                onClick={() => {
+                  setSelectedDoctor(row.original);
+                  setEditModal(true);
+                }}
               >
-                Copy ID
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+              className="bg-destructive"
+                onClick={() => {
+                  setSelectedDoctor(row.original);
+                  setDeleteModal(true);
+                }}
+              >
+                Delete
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-destructive">
@@ -177,51 +160,82 @@ export default function ManageDoctorsTable({
     []
   );
 
-  // ---------------- Table ----------------
+  // -------------------- Filter Data Locally --------------------
+  const filteredData = useMemo(() => {
+    if (!search) return doctors;
+    const lowerSearch = search.toLowerCase();
+    return doctors.filter((doctor) =>
+      doctor.name.toLowerCase().includes(lowerSearch) ||
+      doctor.designation.toLowerCase().includes(lowerSearch) ||
+      doctor.email.toLowerCase().includes(lowerSearch)
+    );
+  }, [search, doctors]);
+
+  // -------------------- React Table --------------------
   const table = useReactTable({
-    data: doctors,
+    data: filteredData,
     columns,
-    pageCount: pagination.totalPage,
-    state: { pagination: { pageIndex, pageSize: pagination.limit } },
-    manualPagination: true,
+    state: { sorting },
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
 
   // ---------------- Pagination Handlers ----------------
   const handlePageChange = (newPage: number) => {
-   
-    if (newPage < 1 || newPage > pagination.totalPage) return;
+    if (newPage < 1 || newPage > pagination.totalPages) return;
     setPageIndex(newPage);
-
-    // update URL query
     router.push(`?page=${newPage}`, { scroll: false });
-
-    // trigger API refetch
-    onPageChange(newPage);
   };
 
   return (
     <div className="w-full space-y-4">
+      {/* ---------------- Search Input ---------------- */}
+      <div className="flex justify-end bg-transparent">
+        <div className="relative w-80 bg-transparent ">
+             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
+          <input
+            type="text"
+            placeholder="Search doctor, email, designation..."
+            className="border rounded-lg pl-10 pr-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 bg-card shadow-sm"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
+
+ 
+      {/* ---------------- Table ---------------- */}
       <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
         <Table>
           <TableHeader className="bg-muted/50">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="text-xs uppercase font-semibold">
+                  <TableHead
+                    key={header.id}
+                    className="text-xs uppercase font-semibold cursor-pointer select-none"
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
                     {flexRender(header.column.columnDef.header, header.getContext())}
+                    {{
+                      asc: " 🔼",
+                      desc: " 🔽",
+                    }[header.column.getIsSorted() as string] ?? null}
                   </TableHead>
                 ))}
               </TableRow>
             ))}
           </TableHeader>
+
           <TableBody>
             {isLoading
-              ? Array.from({ length: pagination.limit }).map((_, i) => (
+              ? Array.from({ length: 10 }).map((_, i) => (
                   <TableRow key={i}>
                     {columns.map((_, j) => (
-                      <TableCell key={j}>
-                        <Skeleton className="h-6 w-full" />
+                      <TableCell key={j} className="py-3">
+                        <Skeleton className="h-5 w-full rounded-md" />
                       </TableCell>
                     ))}
                   </TableRow>
@@ -239,14 +253,31 @@ export default function ManageDoctorsTable({
         </Table>
       </div>
 
-      {/* Pagination */}
+      {/* ---------------- Edit Modal ---------------- */}
+      {editModal && selectedDoctor && (
+        <UpdateDoctorModal
+          isOpen={editModal}
+          setIsOpen={setEditModal}
+          doctor={selectedDoctor}
+        />
+      )}
+      {deleteModal && selectedDoctor && (
+        <DeleteDoctorModal
+          isOpen={deleteModal}
+          setIsOpen={()=> setDeleteModal(false)}
+          doctorEmail={selectedDoctor.email}
+          doctorId={selectedDoctor.id}
+        />
+      )}
+
+      {/* ---------------- Pagination ---------------- */}
       <div className="flex items-center justify-between px-2">
         <div className="text-sm text-muted-foreground font-medium">
-          Total Doctors: {pagination.total}
+          Total Doctors: {filteredData.length}
         </div>
         <div className="flex items-center gap-6">
           <span className="text-sm font-medium">
-            Page {pagination.page} of {pagination.totalPage}
+            Page {pagination.page} of {pagination.totalPages || 1}
           </span>
           <div className="flex gap-2">
             <Button
@@ -260,8 +291,8 @@ export default function ManageDoctorsTable({
             <Button
               variant="outline"
               size="sm"
-              disabled={pagination.page >= pagination.totalPage}
-              onClick={() => handlePageChange(Number(currentPageQuery) + 1)}
+              disabled={pagination.page >= (pagination.totalPages || 1)}
+              onClick={() => handlePageChange(pagination.page + 1)}
             >
               Next
             </Button>
