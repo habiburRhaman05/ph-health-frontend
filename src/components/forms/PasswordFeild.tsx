@@ -1,31 +1,30 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
-import { Control, FieldPath, FieldValues } from "react-hook-form";
+import { useState } from 'react'
 import {
   FormField,
   FormItem,
   FormLabel,
   FormControl,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Eye, EyeOff } from 'lucide-react'
 
-interface FormPasswordProps<T extends FieldValues> {
-  control: Control<T>;
-  name: FieldPath<T>;
-  label: string;
-  disabled?: boolean;
+type Props = {
+  control: any
+  name: string
+  label: string
+  disabled?: boolean
 }
 
-export function FormPassword<T extends FieldValues>({
+export function FormPassword({
   control,
   name,
   label,
   disabled,
-}: FormPasswordProps<T>) {
-  const [show, setShow] = useState(false);
+}: Props) {
+  const [show, setShow] = useState(false)
 
   return (
     <FormField
@@ -34,30 +33,29 @@ export function FormPassword<T extends FieldValues>({
       render={({ field }) => (
         <FormItem>
           <FormLabel>{label}</FormLabel>
+
           <FormControl>
             <div className="relative">
               <Input
-                {...field}
-                type={show ? "text" : "password"}
+                type={show ? 'text' : 'password'}
                 disabled={disabled}
+                {...field} 
               />
+
               <button
                 type="button"
-                onClick={() => setShow((p) => !p)}
-                disabled={disabled}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
+                onClick={() => setShow(!show)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
               >
-                {show ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
+                {show ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
           </FormControl>
+
+
           <FormMessage />
         </FormItem>
       )}
     />
-  );
+  )
 }

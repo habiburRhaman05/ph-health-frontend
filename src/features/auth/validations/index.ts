@@ -35,10 +35,13 @@ export const DoctorSignupSchema = z.object({
   path: ['confirmPassword'],
 })
 
+
+
 export const LoginSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: z.string().email('Valid email is required'),
   password: z.string().min(1, 'Password is required'),
 })
+
 
 export type PatientSignupFormData = z.infer<typeof PatientSignupSchema>
 export type DoctorSignupFormData = z.infer<typeof DoctorSignupSchema>

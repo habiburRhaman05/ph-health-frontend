@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
 import { extractText } from "unpdf";
+import { envVeriables } from "@/config/envVariables";
 
 const groq = new Groq({ apiKey: "" });
 

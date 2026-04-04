@@ -47,6 +47,8 @@ export function SignupForm() {
   })
 
   const { mutateAsync: handleSignup, isPending: isLoading } = useApiMutation({
+    actionName:"",
+    actionType:"SERVER_SIDE",
     method: "POST",
     endpoint: "/auth/register",
   })
