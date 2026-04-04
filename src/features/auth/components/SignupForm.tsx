@@ -20,11 +20,12 @@ import { SPECIALTIES } from '@/features/shared/constants'
 import type { PatientSignupFormData, DoctorSignupFormData } from '../validations'
 import { PatientSignupSchema, DoctorSignupSchema } from '../validations'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
-import { useApiMutation } from '@/hooks/useApiMutation'
+
 import { useRouter } from 'next/navigation'
 import { EmailConfirmation } from './EmailConfirmation'
 import SocialLogin from './SocialLogin'
-
+import { useApiMutation } from '@/hooks/useApiMutation'
+import { signupUser } from '@/services/auth.services'
 
 
 export function SignupForm() {
@@ -46,12 +47,10 @@ export function SignupForm() {
 },
   })
 
-  const { mutateAsync: handleSignup, isPending: isLoading } = useApiMutation({
-    actionName:"",
-    actionType:"SERVER_SIDE",
-    method: "POST",
-    endpoint: "/auth/register",
-  })
+
+
+  const {mutate:handleSignUp,isPending:isSignupLoading} = useApiMutation(signupUser)
+
 
   async function onSubmit(data: PatientSignupFormData | DoctorSignupFormData) {
     
@@ -63,7 +62,7 @@ export function SignupForm() {
         contactNumber: data.phone,
       }
       
-      await handleSignup(payload)
+      await handleSignUp(payload)
       setIsModalOpen(true)
       
   }
@@ -87,7 +86,7 @@ export function SignupForm() {
                   <FormItem>
                     <FormLabel className="text-sm">First Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="John" {...field} disabled={isLoading} className="h-9" />
+                      <Input placeholder="John" {...field} disabled={isSignupLoading} className="h-9" />
                     </FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -100,7 +99,7 @@ export function SignupForm() {
                   <FormItem>
                     <FormLabel className="text-sm">Last Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Doe" {...field} disabled={isLoading} className="h-9" />
+                      <Input placeholder="Doe" {...field} disabled={isSignupLoading} className="h-9" />
                     </FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -117,7 +116,7 @@ export function SignupForm() {
                   <FormItem>
                     <FormLabel className="text-sm">Email Address</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="john@example.com" {...field} disabled={isLoading} className="h-9" />
+                      <Input type="email" placeholder="john@example.com" {...field} disabled={isSignupLoading} className="h-9" />
                     </FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -130,7 +129,7 @@ export function SignupForm() {
                   <FormItem>
                     <FormLabel className="text-sm">Phone Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="+92 300 1234567" {...field} disabled={isLoading} className="h-9" />
+                      <Input placeholder="+92 300 1234567" {...field} disabled={isSignupLoading} className="h-9" />
                     </FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -153,7 +152,7 @@ export function SignupForm() {
                           type={showPassword ? 'text' : 'password'}
                           placeholder="••••••••"
                           {...field}
-                          disabled={isLoading}
+                          disabled={isSignupLoading}
                           className="h-9 pr-10"
                         />
                         <button
@@ -181,7 +180,7 @@ export function SignupForm() {
                           type={showConfirmPassword ? 'text' : 'password'}
                           placeholder="••••••••"
                           {...field}
-                          disabled={isLoading}
+                          disabled={isSignupLoading}
                           className="h-9 pr-10"
                         />
                         <button
@@ -206,7 +205,7 @@ export function SignupForm() {
               render={({ field }) => (
                 <FormItem className="flex items-start gap-2 space-y-0">
                   <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled={isLoading} />
+                    <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled={isSignupLoading} />
                   </FormControl>
                   <FormLabel className="text-xs font-normal leading-tight cursor-pointer">
                     I agree to the Terms & Conditions and Privacy Policy
@@ -215,8 +214,8 @@ export function SignupForm() {
               )}
             />
 
-            <Button type="submit" className="w-full h-10 font-semibold" disabled={isLoading}>
-              {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : 'Create Account'}
+            <Button type="submit" className="w-full h-10 font-semibold" disabled={isSignupLoading}>
+              {isSignupLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : 'Create Account'}
             </Button>
 
               {/* Divider */}

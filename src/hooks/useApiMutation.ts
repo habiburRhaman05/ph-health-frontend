@@ -1,119 +1,62 @@
 "use client"
 
-import httpClient from "@/lib/axios-client";
-import { queryClient } from "@/lib/react-query";
-import { serverApi } from "@/lib/serverApi";
-import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { ErrorInfo } from "react";
+import { useMutation, UseMutationOptions, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { ApiError } from "@/lib/error";
 
-type MutationMethod = "POST" | "PUT" | "PATCH" | "DELETE";
-
-type VariableWithMeta<T> = T & {
-  meta?: {
-    successMessage?: string;
-    errorMessage?: string;
-  }
-};
-
-interface MutationConfig {
-  actionName: string;
-  endpoint: string;
-  method: MutationMethod;
-  actionType:"CLIENT_SIDE" | "SERVER_SIDE"
-  invalidateKeys?: string[];
-  successMessage?: string;
+interface MutationExtras<TData, TVariables> {
+  invalidateKeys?: string[] | string[][];
+  successMessage?: string | ((data: TData) => string);
   errorMessage?: string;
 }
 
-export function useApiMutation<TData = any, TVariables = any, TContext = unknown>(
-  config: MutationConfig,
-  hookOptions?: UseMutationOptions<TData, Error, VariableWithMeta<TVariables>, TContext>
+export function useApiMutation<TData = any, TVariables = void>(
+  mutationFn: (vars: TVariables) => Promise<TData>,
+  options: MutationExtras<TData, TVariables> & UseMutationOptions<TData, ApiError, TVariables> = {}
 ) {
-  const { method,actionName, endpoint, actionType, invalidateKeys, successMessage: configSuccess, errorMessage: configError } = config;
 
-  return useMutation<TData, Error, VariableWithMeta<TVariables>, TContext>({
-    mutationFn: async (variables) => {
-      const { meta, ...payload } = (variables || {}) as any;
-      const actionsInfo = {
-        
-        url: endpoint,
-        method,
-        body: payload,
-        actionName:actionName
-      }
-      if (actionType === "SERVER_SIDE")  return await handleServerAction(actionsInfo) 
-      
-      const response = await httpClient(actionsInfo);
-      return response.data;
-    },
+  const queryClient = useQueryClient();
+  const { invalidateKeys, successMessage, errorMessage, ...mutationOptions } = options;
 
-    onSuccess: (data, variables, context) => {
-      // 1. Resolve Success Message
-      const finalSuccessMessage = 
-        variables?.meta?.successMessage || 
-        configSuccess || 
-        (data as any)?.message || 
-        "Action completed successfully";
+  return useMutation({
+    mutationFn,
+    ...mutationOptions,
+    onSuccess: async (data, vars, context) => {
+      // 1. Success Notification
+      const msg = typeof successMessage === "function" ? successMessage(data) : successMessage;
+      toast.success(msg || (data as any)?.message || "Action successful");
 
-      toast.success(finalSuccessMessage);
-
-      // 2. Invalidate Queries
+      // 2. Cache Invalidation
       if (invalidateKeys) {
-        invalidateKeys.forEach((key) => {
-          queryClient.invalidateQueries({ queryKey: [key] });
-        });
+        await Promise.all(
+          invalidateKeys.map(key => queryClient.invalidateQueries({ queryKey: Array.isArray(key) ? key : [key] }))
+        );
       }
 
-      // 3. FIX: Execute hook-level options using 'apply' or spreading to ignore argument count
-      if (hookOptions?.onSuccess) {
-        (hookOptions.onSuccess as Function)(data, variables, context);
-      }
+      options.onSuccess?.(data, vars, context);
     },
 
-    onError: (error: any, variables, context) => {
-      // 1. Resolve Error Message
-      const apiErrorMessage = error.response?.data?.error?.message || error.response?.data?.message;
-      const finalErrorMessage = 
-        variables?.meta?.errorMessage || 
-        configError || 
-        apiErrorMessage || 
-        "Something went wrong.";
+    onError: (error, vars, context) => {
+      console.log(error);
+      
+      const { type, message, status } = error;
 
-      toast.error(finalErrorMessage, {
-        description: `Error Code: ${error.response?.status || "Unknown"}`,
+      // 3. Categorized Error Toasts
+      const toastConfigs = {
+        VALIDATION: { title: "Validation Error", func: toast.warning },
+        UNAUTHORIZED: { title: "Session Expired", func: toast.error },
+        NETWORK_ERROR: { title: "No Connection", func: toast.error },
+        FORBIDDEN: { title: "Access Denied", func: toast.error },
+        NOT_FOUND: { title: "Not Found", func: toast.info },
+        SERVER_ERROR: { title: "Server Error", func: toast.error },
+      };
+
+      const config = toastConfigs[type] || toastConfigs.SERVER_ERROR;
+      config.func(config.title, {
+        description: errorMessage || message,
       });
 
-      // 2. FIX: Execute hook-level error callback
-      if (hookOptions?.onError) {
-        (hookOptions.onError as Function)(error, variables, context);
-      }
+      options.onError?.(error, vars, context);
     },
-    
-    // Spread other options like onMutate or retry
-    ...hookOptions,
   });
-}
-
-
-export const handleServerAction = async (actionsInfo:{
-    url:string,
-  method:"POST" | "PUT" | "PATCH" | "DELETE",
-  body:any,
-  actionName:string
-})=>{
-  try {
-        const response = await serverApi(actionsInfo.url,{
-        body:JSON.stringify(actionsInfo.body),
-        method:actionsInfo.method
-    });
-  return response
-  } catch (error:any) {
-    console.log(error);
-    
-    return {
-      success:false,
-      message:error.message || `Something Wrong Doing ${actionsInfo.actionName}! Check Logs`
-    }
-  }
 }

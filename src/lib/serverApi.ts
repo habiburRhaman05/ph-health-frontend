@@ -1,112 +1,87 @@
-
 "use server"
-import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
-import { isTokenExpiring } from "./jwt"
-import { StringDecoder } from "string_decoder"
-import { setTokenInCookies } from "./token"
 
-let refreshPromise: Promise<string | null> | null = null
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-export async function refreshAccessToken(cookies:string): Promise<string | null> {
-  if (!refreshPromise) {
-    refreshPromise = (async () => {
-     try {
-       const res = await fetch(`${process.env.API_URL}/auth/refresh-token`, {
+import { ApiError, ErrorType } from "./error";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
+
+let refreshPromise: Promise<string | null> | null = null;
+
+async function refreshAccessToken(cookieString: string): Promise<string | null> {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
+    try {
+      const res = await fetch(`${process.env.API_URL}/auth/refresh-token`, {
         method: "POST",
-        headers:{
-          cookie:cookies,
-        },
-        credentials: "include",
+        headers: { cookie: cookieString },
         cache: "no-store",
-      })
-      if (!res.ok) {
-        refreshPromise = null
-        return null
-      }
-      const json = await res.json().catch(() => null)
-      refreshPromise = null
+      });
 
-
-      const {accessToken,refreshToken,sessionToken} = json?.data;
-
-      await setTokenInCookies("accessToken",accessToken,10*60)
-      await setTokenInCookies("refreshToken",refreshToken,30*60)
-      await setTokenInCookies("better-auth.session_token",sessionToken,10*60)
-
-      return json?.data.accessToken ?? null
-     } catch (error) {
-      console.log("refresh token error",error);
-     }
-    })()
-  }
-  return refreshPromise
+      if (!res.ok) return null;
+      const { data } = await res.json();
+      return data?.accessToken ?? null;
+    } catch (error) {
+      console.error("[Auth] Token refresh failed:", error);
+      return null;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+  
+  return refreshPromise;
 }
 
-/**
- * serverApi: for Server Actions (POST/PUT/DELETE)
- * central 401 handling + proactive refresh
- */
-export async function serverApi(path: string, options: RequestInit = {}) {
-  const cookieStore = await cookies()
+export async function serverApi<T = unknown>(path: string, options: RequestInit = {}): Promise<T> {
+  const cookieStore = await cookies();
+  const initialCookies = cookieStore.toString();
 
-const headers = {
-    "Content-Type": "application/json",
-    ...options.headers,
-    cookie: cookieStore.toString(),
-  };
+  const headers = new Headers(options.headers);
+  headers.set("Content-Type", "application/json");
+  if (initialCookies) headers.set("cookie", initialCookies);
 
-  // 2. Stringify body if it exists and isn't already a string
-  const body = options.body && typeof options.body === 'object' 
-    ? JSON.stringify(options.body) 
-    : options.body;
-
-  const fetchOptions = {
+  const fetchOptions: RequestInit = {
     ...options,
     headers,
-    body,
-    credentials: "include" as const,
+    body: options.body && typeof options.body === "object" 
+      ? JSON.stringify(options.body) 
+      : options.body as BodyInit,
   };
-try {
-    let res = await fetch(`${process.env.API_URL}${path}`,fetchOptions)
 
+  try {
+    let res = await fetch(`${process.env.API_URL}${path}`, fetchOptions);
 
+    if (res.status === 401) {
+      const newAccess = await refreshAccessToken(initialCookies);
+      if (!newAccess) redirect("/sign-in");
 
-  if (res.status === 401) {
-    console.log("receive 401 error");
-    
-    const newAccess = await refreshAccessToken(cookieStore.toString())
-console.log(cookieStore.toString());
-
-    if (!newAccess) redirect("/sign-in")
-
-    res = await fetch(`${process.env.API_URL}${path}`, {
-      ...options,
-      headers: {
-        ...((options && options.headers) || {}),
-      cookie:cookieStore.toString()
-      },
-      credentials: "include",
-    })
-    console.log(res);
-    
-    if(!res.ok){
-      console.log("creating error");
-      
+      const updatedCookies = await cookies();
+      headers.set("cookie", updatedCookies.toString());
+      res = await fetch(`${process.env.API_URL}${path}`, { ...fetchOptions, headers });
     }
-    const data = await res.json()
 
-    return JSON.parse(JSON.stringify(data));
+    const data = await res.json().catch(() => ({}));
 
+    if (!res.ok) {
+      const typeMap: Record<number, ErrorType> = {
+        400: "VALIDATION",
+        401: "UNAUTHORIZED",
+        403: "FORBIDDEN",
+        404: "NOT_FOUND",
+      };
+      throw new ApiError(
+        data.message || "An unexpected error occurred",
+        res.status,
+        typeMap[res.status] || "SERVER_ERROR",
+        data
+      );
+    }
+
+    return data as T;
+  } catch (error: any) {
+    if (isRedirectError(error)) throw error;
+    if (error instanceof ApiError) throw error;
+    throw new ApiError("Network connection failure", 0, "NETWORK_ERROR");
   }
-
-    const data = await res.json()
-
-    return JSON.parse(JSON.stringify(data));
-
-
-} catch (error) {
-  console.log("servre api error",error);
-  
-}
 }
